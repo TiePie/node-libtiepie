@@ -1,0 +1,26 @@
+{
+  "name": "libtiepie",
+  "version": "0.7.0",
+  "description": "NodeJS bindings for LibTiePie",
+  "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/TiePie/node-libtiepie.git"
+  },
+  "scripts": {
+    "test": "tap --gc test/*.js"
+  },
+  "homepage": "https://www.tiepie.com",
+  "author": "TiePie engineering",
+  "license": "MIT",
+  "dependencies": {
+    "nan": "^2.5.1"
+  },
+  "devDependencies": {
+    "tap": "^11.0.1"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "gypfile": true
+}

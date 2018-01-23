@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "9"
+  - "8"
+  - "6"
+  - "4"
+dist: trusty
+sudo: false
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - sourceline: 'deb http://packages.tiepie.com/ubuntu trusty multiverse'
+      key_url: 'http://packages.tiepie.com/public.key'
+    packages:
+    - g++-4.8
+    - libtiepie-dev
