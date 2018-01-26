@@ -1,4 +1,4 @@
-# Node-LibTiePie [![Build Status](https://travis-ci.org/TiePie/node-libtiepie.svg?branch=master)](https://travis-ci.org/TiePie/node-libtiepie)
+# Node-LibTiePie [![CircleCI](https://circleci.com/gh/TiePie/node-libtiepie/tree/master.svg?style=shield)](https://circleci.com/gh/TiePie/node-libtiepie/tree/master)
 
 ## Installation
 `$ npm install git://github.com/TiePie/node-libtiepie.git`
