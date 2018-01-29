@@ -1,8 +1,20 @@
 #include <nan.h>
-#include <libtiepie.h>
 #include <string>
 #include <sstream>
 #include <limits>
+
+#ifdef _MSC_VER
+  #include "libtiepieloader.h"
+
+  #ifdef min
+    #undef min
+  #endif
+  #ifdef max
+    #undef max
+  #endif
+#else
+  #include <libtiepie.h>
+#endif
 
 #define CHECK_PARAMETER_COUNT(expected) { const int length = info.Length(); if(length != expected) { std::stringstream ss; ss << "Invalid parameter count, expected " << expected << " got " << length << "."; return Nan::ThrowSyntaxError(ss.str().c_str()); } }
 #define CHECK_RANGE(value, min, max) { if((value < min) || (value > max)) return Nan::ThrowRangeError("Value out of range"); }
@@ -17,8 +29,27 @@ std::string tpVersionToStr(TpVersion_t version)
 
 void AtExit(void*)
 {
-  LibExit();
+  if(LibIsInitialized() == BOOL8_TRUE)
+    LibExit();
+
+#ifdef _MSC_VER
+  LibTiePieUnload();
+#endif
 }
+
+#ifdef _MSC_VER
+NAN_METHOD(LibTiePieLoadWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+
+  const std::string path(*Nan::Utf8String(info[0]));
+
+  if(LibTiePieLoad(path.c_str()) != LIBTIEPIESTATUS_SUCCESS)
+    return Nan::ThrowError("Failed to load libtiepie.dll");
+
+  LibInit();
+}
+#endif
 
 NAN_METHOD(LibGetVersionWrapper)
 {
@@ -48,7 +79,7 @@ NAN_METHOD(LibGetConfigWrapper)
   LibGetConfig(&buffer[0], length);
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Uint32>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -334,7 +365,7 @@ NAN_METHOD(LstDevGetContainedSerialNumbersWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Uint32>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -955,7 +986,7 @@ NAN_METHOD(ScpChGetBandwidthsWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Number>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1150,7 +1181,7 @@ NAN_METHOD(ScpChGetRangesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Number>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1644,7 +1675,7 @@ NAN_METHOD(ScpGetDataWrapper)
     {
       v8::Local<v8::Array> tmp = Nan::New<v8::Array>();
       for(uint_fast64_t j = 0; j < sampleCount; ++j)
-        tmp->Set(j, Nan::New<v8::Number>(buffers[i][j]));
+        tmp->Set((uint32_t)j, Nan::New<v8::Number>(buffers[i][j]));
       result->Set(i, tmp);
     }
     else
@@ -1884,7 +1915,7 @@ NAN_METHOD(ScpGetResolutionsWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Uint32>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1971,7 +2002,7 @@ NAN_METHOD(ScpGetClockSourceFrequenciesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Number>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -2046,7 +2077,7 @@ NAN_METHOD(ScpGetClockOutputFrequenciesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Number>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -2746,7 +2777,7 @@ NAN_METHOD(GenGetAmplitudeRangesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set(i, Nan::New<v8::Number>(buffer[i]));
+    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -3897,6 +3928,12 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_SYNCHRONIZATION_FAILED").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_SYNCHRONIZATION_FAILED), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INVALID_HS56_COMBINED_DEVICE").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INVALID_HS56_COMBINED_DEVICE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_MEASUREMENT_RUNNING").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_MEASUREMENT_RUNNING), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10001").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10001), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10002").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10002), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10003").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10003), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10004").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10004), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10005").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10005), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIESTATUS_INITIALIZATION_ERROR_10006").ToLocalChecked(), Nan::New<v8::Int32>((int32_t)LIBTIEPIESTATUS_INITIALIZATION_ERROR_10006), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("CONNECTORTYPE_UNKNOWN").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)CONNECTORTYPE_UNKNOWN), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("CONNECTORTYPE_BNC").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)CONNECTORTYPE_BNC), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("CONNECTORTYPE_BANANA").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)CONNECTORTYPE_BANANA), v8::ReadOnly);
@@ -4194,7 +4231,14 @@ NAN_MODULE_INIT(init)
   Nan::Set(target, Nan::New<v8::String>("const").ToLocalChecked(), constants);
   Nan::Set(target, Nan::New<v8::String>("api").ToLocalChecked(), api);
 
+#ifdef _MSC_VER
+  v8::Local<v8::Array> loader = Nan::New<v8::Array>();
+  Nan::Set(loader, Nan::New<v8::String>("LibTiePieLoad").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LibTiePieLoadWrapper)->GetFunction());
+  Nan::Set(target, Nan::New<v8::String>("loader").ToLocalChecked(), loader);
+#else
   LibInit();
+#endif
+
   node::AtExit(AtExit);
 }
 

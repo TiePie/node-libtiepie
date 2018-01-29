@@ -1,6 +1,6 @@
 {
   "name": "libtiepie",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "NodeJS bindings for LibTiePie",
   "main": "./lib/index.js",
   "repository": {

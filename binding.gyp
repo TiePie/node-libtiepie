@@ -1,14 +1,42 @@
 {
-  "targets": [
+  'targets':
+  [
     {
-      "target_name": "node_libtiepie",
-      "sources": [
-        "src/libtiepie.cc"
+      'target_name': 'node_libtiepie',
+      'sources':
+      [
+        'src/libtiepie.cc'
       ],
-      "include_dirs": [
-        "<!(node -e \"require('nan')\")"
+      'include_dirs':
+      [
+        '<!(node -e "require(\'nan\')")'
       ],
-      "libraries": ["-ltiepie"]
+      'conditions':
+      [
+        [
+          'OS=="linux"',
+          {
+            'libraries': ['-ltiepie']
+          }
+        ],
+        [
+          'OS=="win"',
+          {
+            'sources':
+            [
+              'src/libtiepieloader.cc'
+            ],
+            'defines':
+            [
+              'LIBTIEPIE_DYNAMIC'
+            ],
+            'include_dirs':
+            [
+              '<(module_root_dir)/deps/libtiepie/include'
+            ]
+          }
+        ]
+      ]
     }
   ]
 }
