@@ -11,6 +11,9 @@
 const libtiepie = require('libtiepie');
 const sleep = require('sleep');
 
+// Enable network search:
+libtiepie.api.NetSetAutoDetectEnabled(true);
+
 // Update device list:
 libtiepie.api.LstUpdate();
 

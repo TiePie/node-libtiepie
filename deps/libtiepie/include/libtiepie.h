@@ -57,11 +57,11 @@ extern "C"
 #endif
 
 #define LIBTIEPIE_VERSION_MAJOR    0
-#define LIBTIEPIE_VERSION_MINOR    7
-#define LIBTIEPIE_VERSION_RELEASE  4
-#define LIBTIEPIE_VERSION_NUMBER   "0.7.4"
-#define LIBTIEPIE_VERSION          "0.7.4"
-#define LIBTIEPIE_REVISION         12616
+#define LIBTIEPIE_VERSION_MINOR    9
+#define LIBTIEPIE_VERSION_RELEASE  0
+#define LIBTIEPIE_VERSION_NUMBER   "0.9.0"
+#define LIBTIEPIE_VERSION          "0.9.0"
+#define LIBTIEPIE_REVISION         13850
 
 /**
  * \mainpage
@@ -71,13 +71,18 @@ extern "C"
  * The LibTiePie library is a library for using TiePie engineering USB instruments through third party software.
  *
  * \subsection instruments Supported instruments
- * - <a class="External" href="http://www.tiepie.com/HS6D">Handyscope HS6 DIFF</a>
- * - <a class="External" href="http://www.tiepie.com/HS5">Handyscope HS5</a>
- * - <a class="External" href="http://www.tiepie.com/HS4">Handyscope HS4</a>
- * - <a class="External" href="http://www.tiepie.com/HS4D">Handyscope HS4 DIFF</a>
- * - <a class="External" href="http://www.tiepie.com/HS3">Handyscope HS3</a>
- * - <a class="External" href="http://www.tiepie-automotive.com/ATS5004D">ATS5004D</a>
- * - <a class="External" href="http://www.tiepie.com/HP3">Handyprobe HP3</a>
+ * - <a class="External" href="https://www.tiepie.com/WS6">WiFiScope WS6</a>
+ * - <a class="External" href="https://www.tiepie.com/WS5">WiFiScope WS5</a>
+ * - <a class="External" href="https://www.tiepie.com/HS6D">Handyscope HS6 DIFF</a>
+ * - <a class="External" href="https://www.tiepie.com/HS5">Handyscope HS5</a>
+ * - <a class="External" href="https://www.tiepie.com/HS4">Handyscope HS4</a>
+ * - <a class="External" href="https://www.tiepie.com/HS4D">Handyscope HS4 DIFF</a>
+ * - <a class="External" href="https://www.tiepie.com/HS3">Handyscope HS3</a>
+ * - <a class="External" href="https://www.tiepie-automotive.com/ATS610004D">ATS610004D</a>
+ * - <a class="External" href="https://www.tiepie-automotive.com/ATS605004D">ATS605004D</a>
+ * - <a class="External" href="https://www.tiepie-automotive.com/ATS5004D">ATS5004D</a>
+ * - <a class="External" href="https://www.tiepie.com/HP3">Handyprobe HP3</a>
+ * - <a class="External" href="https://www.tiepie.com/TP450">Handyscope TP450</a>
  *
  * \subsection structure Library structure
  *
@@ -100,6 +105,7 @@ extern "C"
  *   <tr><td>\b Lst</td>     <td>\ref lst related functions</td>                                       </tr>
  *   <tr><td>\b LstDev</td>  <td>\ref lst_instruments related functions</td>                           </tr>
  *   <tr><td>\b LstCbDev</td><td>\ref lst_combined "Listed combined devices" related functions</td>    </tr>
+ *   <tr><td>\b Net</td>     <td>\ref net related functions</td>    </tr>
  *   <tr><td>\b Obj</td>     <td>\ref obj "Common object" related functions</td>                       </tr>
  *   <tr><td>\b Dev</td>     <td>\ref dev "Common device" related functions</td>                       </tr>
  *   <tr><td>\b DevTrIn</td> <td>\ref dev_trigger_input "Device trigger input" related functions</td>  </tr>
@@ -109,6 +115,7 @@ extern "C"
  *   <tr><td>\b ScpChTr</td> <td>\ref scp_ch_tr "Oscilloscope channel trigger" related functions</td>  </tr>
  *   <tr><td>\b Gen</td>     <td>\ref gen related functions</td>                                       </tr>
  *   <tr><td>\b I2C</td>     <td>\ref i2c related functions</td>                                       </tr>
+ *   <tr><td>\b Srv</td>     <td>\ref srv related functions</td>                                       </tr>
  *   <tr><td>\b Hlp</td>     <td>\ref hlp for bypassing limitations of some programming languages</td> </tr>
  * </table>
  *
@@ -426,6 +433,7 @@ extern "C"
 #define LIBTIEPIE_INTERFACE_OSCILLOSCOPE  0x0000000000000002
 #define LIBTIEPIE_INTERFACE_GENERATOR     0x0000000000000004
 #define LIBTIEPIE_INTERFACE_I2CHOST       0x0000000000000008
+#define LIBTIEPIE_INTERFACE_SERVER        0x0000000000000010
 
 /**
  * \}
@@ -493,6 +501,7 @@ extern "C"
 #define LIBTIEPIESTATUS_INITIALIZATION_FAILED                  -24 //!< \brief The instrument's initialization failed, please contact TiePie engineering support.
 #define LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED                -25 //!< \brief The library is not initialized, see LibInit().
 #define LIBTIEPIESTATUS_NO_TRIGGER_ENABLED                     -26 //!< \brief The current setup requires a trigger input to be enabled.
+
 #define LIBTIEPIESTATUS_SYNCHRONIZATION_FAILED                 -29 //!< \brief XXX
 #define LIBTIEPIESTATUS_INVALID_HS56_COMBINED_DEVICE           -30 //!< \brief At least one Handyscope HS6 DIFF must be located at the beginning or end of the CMI daisy chain.
 #define LIBTIEPIESTATUS_MEASUREMENT_RUNNING                    -31 //!< \brief A measurement is already running.
@@ -597,7 +606,31 @@ extern "C"
 
 /**
  * \}
+ * \defgroup LIBTIEPIE_SERVER_STATUS_ Server status
+ * \{
  */
+
+#define LIBTIEPIE_SERVER_STATUS_DISCONNECTED   0
+#define LIBTIEPIE_SERVER_STATUS_CONNECTING     1
+#define LIBTIEPIE_SERVER_STATUS_CONNECTED      2
+#define LIBTIEPIE_SERVER_STATUS_DISCONNECTING  3
+
+/**
+ * \}
+ * \defgroup LIBTIEPIE_SERVER_ERROR Server error codes
+ * \{
+ */
+
+#define LIBTIEPIE_SERVER_ERROR_NONE                  0
+#define LIBTIEPIE_SERVER_ERROR_UNKNOWN               1
+#define LIBTIEPIE_SERVER_ERROR_CONNECTIONREFUSED     2
+#define LIBTIEPIE_SERVER_ERROR_NETWORKUNREACHABLE    3
+#define LIBTIEPIE_SERVER_ERROR_TIMEDOUT              4
+#define LIBTIEPIE_SERVER_ERROR_HOSTNAMELOOKUPFAILED  5
+
+/**
+  *   \}
+  */
 
 //! \cond EXTENDED_API
 
@@ -1171,7 +1204,7 @@ extern "C"
  * \{
  */
 
-#define TKN_COUNT  13 //!< Number of trigger kinds
+#define TKN_COUNT  15 //!< Number of trigger kinds
 
 /**
  * \defgroup TKB_ Bit numbers
@@ -1191,6 +1224,8 @@ extern "C"
 #define TKB_RUNTPULSEPOSITIVE  10
 #define TKB_RUNTPULSENEGATIVE  11
 #define TKB_RUNTPULSEEITHER    12
+#define TKB_INTERVALRISING     13
+#define TKB_INTERVALFALLING    14
 
 /**
  * \}
@@ -1210,6 +1245,8 @@ extern "C"
 #define TK_RUNTPULSEPOSITIVE  ( 1ULL << TKB_RUNTPULSEPOSITIVE )   //!< Positive runt pulse
 #define TK_RUNTPULSENEGATIVE  ( 1ULL << TKB_RUNTPULSENEGATIVE )   //!< Negative runt pulse
 #define TK_RUNTPULSEEITHER    ( 1ULL << TKB_RUNTPULSEEITHER )     //!< Positive or negative runt pulse
+#define TK_INTERVALRISING     ( 1ULL << TKB_INTERVALRISING )      //!< Interval (rising edge)
+#define TK_INTERVALFALLING    ( 1ULL << TKB_INTERVALFALLING )     //!< Interval (falling edge)
 
 /**
  * \defgroup TKM_ Masks
@@ -1222,7 +1259,8 @@ extern "C"
 #define TKM_PULSEWIDTH       ( TK_PULSEWIDTHPOSITIVE | TK_PULSEWIDTHNEGATIVE | TK_PULSEWIDTHEITHER ) //!< All pulse width triggers
 #define TKM_RUNTPULSE        ( TK_RUNTPULSEPOSITIVE | TK_RUNTPULSENEGATIVE | TK_RUNTPULSEEITHER ) //!< All runt pulse triggers
 #define TKM_PULSE            ( TKM_PULSEWIDTH | TKM_RUNTPULSE ) //!< All pulse triggers
-#define TKM_TIME             ( TKM_PULSEWIDTH | TKM_WINDOW ) //!< All trigger kinds that may have a time property.
+#define TKM_INTERVAL         ( TK_INTERVALRISING | TK_INTERVALFALLING ) //!< All interval triggers
+#define TKM_TIME             ( TKM_PULSEWIDTH | TKM_WINDOW | TKM_INTERVAL ) //!< All trigger kinds that may have a time property.
 #define TKM_ALL              ( ( 1ULL << TKN_COUNT ) - 1 ) //!< All trigger kinds
 
 /**
@@ -1329,6 +1367,9 @@ extern "C"
 #define PID_HS6D       25 //!< Handyscope HS6 DIFF
 #define PID_ATS610004D 31 //!< ATS610004D
 #define PID_ATS605004D 32 //!< ATS605004D
+#define PID_125020VI   33 //!< Virtual instrument 1250-20
+#define PID_WS6        34 //!< WiFiScope WS6
+#define PID_WS5        35 //!< WiFiScope WS5
 
 /**
  * \}
@@ -1354,6 +1395,7 @@ extern "C"
 #define LIBTIEPIE_EVENTID_SCP_GETDATAASYNCCOMPLETED        10 //!< XXX
 /** \endcond.
  */
+#define LIBTIEPIE_EVENTID_DEV_BATTERYSTATUSCHANGED         11 //!< XXX
 
 /**
  * \}
@@ -1468,6 +1510,8 @@ typedef void(*TpCallbackEvent_t)( void* pData , uint32_t dwEvent , uint32_t dwVa
 #define WM_LIBTIEPIE_LST_DEVICEADDED              ( WM_LIBTIEPIE + 2 ) //!< \see LstSetMessageDeviceAdded
 #define WM_LIBTIEPIE_LST_DEVICEREMOVED            ( WM_LIBTIEPIE + 3 ) //!< \see LstSetMessageDeviceRemoved
 #define WM_LIBTIEPIE_LST_DEVICECANOPENCHANGED     ( WM_LIBTIEPIE + 9 ) //!< \see LstSetMessageDeviceCanOpenChanged
+
+#define WM_LIBTIEPIE_NETSRV_ADDED                 ( WM_LIBTIEPIE + 11 ) //!< \see NetSrvSetMessageAdded
 
 #define WM_LIBTIEPIE_DEV_REMOVED                  ( WM_LIBTIEPIE + 4 ) //!< \deprecated Will be removed in future version, see #ObjSetEventWindowHandle
 
@@ -2456,6 +2500,82 @@ uint32_t LstDevGetSerialNumber( uint32_t dwIdKind , uint32_t dwId );
 #endif
 
 /**
+ * \brief Get the IPv4 address of the listed device.
+ *
+ * \param[in] dwIdKind An \ref IDKIND_ "id kind".
+ * \param[in] dwId A device index, \ref PID_ "Product ID" or serial number identifying the device to check, as specified by \c dwIdKind.
+ * \return The IPv4 address of the listed device.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_INDEX "INVALID_DEVICE_INDEX"</td>       <td>The device index is invalid, must be < LstGetCount().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_SERIALNUMBER "INVALID_DEVICE_SERIALNUMBER"</td><td>There is no device with the requested serial number.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_PRODUCT_ID "INVALID_PRODUCT_ID"</td>         <td>There is no device with the requested product ID.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>              <td>The indicated device is not a network device.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>              <td>The value of dwIdKind is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td>    <td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieLstDevGetIPv4Address_t)( uint32_t dwIdKind , uint32_t dwId );
+#else
+uint32_t LstDevGetIPv4Address( uint32_t dwIdKind , uint32_t dwId );
+#endif
+
+/**
+ * \brief Get the IP port number of the listed device.
+ *
+ * \param[in] dwIdKind An \ref IDKIND_ "id kind".
+ * \param[in] dwId A device index, \ref PID_ "Product ID" or serial number identifying the device to check, as specified by \c dwIdKind.
+ * \return The IP port number of the listed device.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_INDEX "INVALID_DEVICE_INDEX"</td>       <td>The device index is invalid, must be < LstGetCount().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_SERIALNUMBER "INVALID_DEVICE_SERIALNUMBER"</td><td>There is no device with the requested serial number.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_PRODUCT_ID "INVALID_PRODUCT_ID"</td>         <td>There is no device with the requested product ID.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>              <td>The indicated device is not a network device.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>              <td>The value of dwIdKind is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td>    <td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint16_t(*LibTiePieLstDevGetIPPort_t)( uint32_t dwIdKind , uint32_t dwId );
+#else
+uint16_t LstDevGetIPPort( uint32_t dwIdKind , uint32_t dwId );
+#endif
+
+/**
+ * \brief Check whether the listed device is connected to a server.
+ *
+ * \param[in] dwIdKind An \ref IDKIND_ "id kind".
+ * \param[in] dwId A device index, \ref PID_ "Product ID" or serial number identifying the device to check, as specified by \c dwIdKind.
+ * \return #BOOL8_TRUE if the device isconnected to a server, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieLstDevHasServer_t)( uint32_t dwIdKind , uint32_t dwId );
+#else
+bool8_t LstDevHasServer( uint32_t dwIdKind , uint32_t dwId );
+#endif
+
+/**
+ * \brief Get the server handle of the server the listed device is connected to.
+ *
+ * \param[in] dwIdKind An \ref IDKIND_ "id kind".
+ * \param[in] dwId A device index, \ref PID_ "Product ID" or serial number identifying the device to check, as specified by \c dwIdKind.
+ * \return A server handle, or #LIBTIEPIE_HANDLE_INVALID on error.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef LibTiePieHandle_t(*LibTiePieLstDevGetServer_t)( uint32_t dwIdKind , uint32_t dwId );
+#else
+LibTiePieHandle_t LstDevGetServer( uint32_t dwIdKind , uint32_t dwId );
+#endif
+
+/**
  * \brief Get the device types of the listed device.
  *
  * \param[in] dwIdKind An \ref IDKIND_ "id kind".
@@ -3106,6 +3226,220 @@ void LstSetMessageDeviceCanOpenChanged( HWND hWnd );
 /**
  * \}
  * \}
+ * \defgroup net Network
+ * \{
+ * \brief Network related functions.
+ */
+
+// Workaround: Without this line Doxygen adds the documentation below to the group above.
+
+/**
+ * \brief Check whether automatically detecting network instruments and instrument servers is enabled.
+ *
+ * \return #BOOL8_TRUE if enabled, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieNetGetAutoDetectEnabled_t)( void );
+#else
+bool8_t NetGetAutoDetectEnabled( void );
+#endif
+
+/**
+ * \brief Enable or disable automatic detection of network instruments and instrument servers.
+ *
+ * \param[in] bEnable #BOOL8_TRUE or #BOOL8_FALSE.
+ * \return #BOOL8_TRUE if enabled, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieNetSetAutoDetectEnabled_t)( bool8_t bEnable );
+#else
+bool8_t NetSetAutoDetectEnabled( bool8_t bEnable );
+#endif
+
+/**
+ * \defgroup net_srv Servers
+ * \{
+ */
+
+// Workaround: Without this line Doxygen adds the documentation below to the group above.
+
+/**
+ * \brief Add a server to the list of servers.
+ *
+ * \param[in] pURL Pointer to URL character buffer.
+ * \param[in] dwURLLength Length of URL buffer or #LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED.
+ * \param[out] pHandle The handle to the added server or \c NULL.
+ * \return #BOOL8_TRUE if added successfully, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieNetSrvAdd_t)( const char* pURL , uint32_t dwURLLength , LibTiePieHandle_t* pHandle );
+#else
+bool8_t NetSrvAdd( const char* pURL , uint32_t dwURLLength , LibTiePieHandle_t* pHandle );
+#endif
+
+/**
+ * \brief Remove a server from the list of servers
+ *
+ * \param[in] pURL Pointer to URL character buffer.
+ * \param[in] dwURLLength Length of URL buffer or #LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED.
+ * \param[in] bForce If #BOOL8_TRUE all open devices are closed, if #BOOL8_FALSE remove only succeeds if no devices are open.
+ * \return #BOOL8_TRUE if removed successfully, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieNetSrvRemove_t)( const char* pURL , uint32_t dwURLLength , bool8_t bForce );
+#else
+bool8_t NetSrvRemove( const char* pURL , uint32_t dwURLLength , bool8_t bForce );
+#endif
+
+/**
+ * \brief Get the number of servers available.
+ *
+ * \return The number of servers available.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieNetSrvGetCount_t)( void );
+#else
+uint32_t NetSrvGetCount( void );
+#endif
+
+/**
+ * \brief Get the handle of a server, based on its index in the list of servers
+ *
+ * \param[in] dwIndex A server index, \c 0 .. NetSrvGetCount() - 1.
+ * \return The handle to the requested server or \c NULL.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef LibTiePieHandle_t(*LibTiePieNetSrvGetByIndex_t)( uint32_t dwIndex );
+#else
+LibTiePieHandle_t NetSrvGetByIndex( uint32_t dwIndex );
+#endif
+
+/**
+ * \brief Get the handle of a server, based on its URL
+ *
+ * \param[in] pURL Pointer to URL character buffer.
+ * \param[in] dwURLLength Length of URL buffer or #LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED.
+ * \return The handle to the requested server or \c NULL.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef LibTiePieHandle_t(*LibTiePieNetSrvGetByURL_t)( const char* pURL , uint32_t dwURLLength );
+#else
+LibTiePieHandle_t NetSrvGetByURL( const char* pURL , uint32_t dwURLLength );
+#endif
+
+/**
+ * \defgroup net_srv_notifications Notifications
+ * \{
+ * \brief Functions to set notifications that are triggered when the server list is changed.
+ *
+ * LibTiePie can notify the calling application that the device list is changed in different ways:
+ * - by calling callback functions
+ * - by setting events
+ * - by sending messages (Windows only)
+ *
+ * \defgroup net_srv_notifications_added Server added
+ * \{
+ * \brief Functions to set notifications that are triggered when a server is added to the server list.
+ */
+
+// Workaround: Without this line Doxygen adds the documentation below to the group above.
+
+/**
+ * \brief Set a callback function which is called when a server is added to the server list.
+ *
+ * \param[in] pCallback A pointer to the \ref TpCallbackHandle_t "callback" function. Use \c NULL to disable.
+ * \param[in] pData Optional user data.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>#LIBTIEPIESTATUS_SUCCESS                </td><td></td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef void(*LibTiePieNetSrvSetCallbackAdded_t)( TpCallbackHandle_t pCallback , void* pData );
+#else
+void NetSrvSetCallbackAdded( TpCallbackHandle_t pCallback , void* pData );
+#endif
+
+#ifdef LIBTIEPIE_LINUX
+
+/**
+ * \brief Set an event file descriptor which is set when a server is added to the server list.
+ *
+ * \param[in] fdEvent An event file descriptor. Use \c <0 to disable.
+ * \note This function is only available on GNU/Linux.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>#LIBTIEPIESTATUS_SUCCESS                </td><td></td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef void(*LibTiePieNetSrvSetEventAdded_t)( int fdEvent );
+#else
+void NetSrvSetEventAdded( int fdEvent );
+#endif
+
+#endif
+
+#ifdef LIBTIEPIE_WINDOWS
+
+/**
+ * \brief Set an event object handle which is set when a server is added to the server list.
+ *
+ * \param[in] hEvent A handle to the event object. Use \c NULL to disable.
+ * \note This function is only available on Windows.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>#LIBTIEPIESTATUS_SUCCESS                </td><td></td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef void(*LibTiePieNetSrvSetEventAdded_t)( HANDLE hEvent );
+#else
+void NetSrvSetEventAdded( HANDLE hEvent );
+#endif
+
+/**
+ * \brief Set a window handle to which a #WM_LIBTIEPIE_NETSRV_ADDED message is sent when a server is added to the server list.
+ *
+ * The parameters of the message contain the following:
+ * - \c wParam contains the server handle.
+ * - \c lParam is reserved.
+ *
+ * \param[in] hWnd A handle to the window whose window procedure is to receive the message. Use \c NULL to disable.
+ * \note This function is only available on Windows.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>#LIBTIEPIESTATUS_SUCCESS                </td><td></td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef void(*LibTiePieNetSrvSetMessageAdded_t)( HWND hWnd );
+#else
+void NetSrvSetMessageAdded( HWND hWnd );
+#endif
+
+#endif
+
+/**
+ * \}
+ * \}
+ * \}
+ * \}
  * \defgroup objmain Object
  * \{
  * \brief Functions to control devices.
@@ -3142,6 +3476,7 @@ void LstSetMessageDeviceCanOpenChanged( HWND hWnd );
  * \see LstOpenOscilloscope
  * \see LstOpenGenerator
  * \see LstOpenI2CHost
+ * \see LstDevGetServerHandle
  * \see NetSrvGetByIndex
  * \see NetSrvGetByURL
  * \since 0.6
@@ -3517,6 +3852,52 @@ uint32_t DevGetSerialNumber( LibTiePieHandle_t hDevice );
 #endif
 
 /**
+ * \brief Get the IPv4 address of the device.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return The IPv4 address of the device, or zero if no IPv4 address is available.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_INDEX "INVALID_DEVICE_INDEX"</td>       <td>The device index is invalid, must be < LstGetCount().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_SERIALNUMBER "INVALID_DEVICE_SERIALNUMBER"</td><td>There is no device with the requested serial number.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_PRODUCT_ID "INVALID_PRODUCT_ID"</td>         <td>There is no device with the requested product ID.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>              <td>The indicated device is not a network device.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>              <td>The value of dwIdKind is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td>    <td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieDevGetIPv4Address_t)( LibTiePieHandle_t hDevice );
+#else
+uint32_t DevGetIPv4Address( LibTiePieHandle_t hDevice );
+#endif
+
+/**
+ * \brief Get the IP port number of the device.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return The IP port number of the device, or zero if no IP port number is available.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_INDEX "INVALID_DEVICE_INDEX"</td>       <td>The device index is invalid, must be < LstGetCount().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_SERIALNUMBER "INVALID_DEVICE_SERIALNUMBER"</td><td>There is no device with the requested serial number.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_PRODUCT_ID "INVALID_PRODUCT_ID"</td>         <td>There is no device with the requested product ID.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>              <td>The indicated device is not a network device.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>              <td>The value of dwIdKind is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td>    <td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint16_t(*LibTiePieDevGetIPPort_t)( LibTiePieHandle_t hDevice );
+#else
+uint16_t DevGetIPPort( LibTiePieHandle_t hDevice );
+#endif
+
+/**
  * \brief Get the product id of the device.
  *
  * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
@@ -3698,6 +4079,172 @@ uint32_t DevGetNameShort( LibTiePieHandle_t hDevice , char* pBuffer , uint32_t d
 typedef uint32_t(*LibTiePieDevGetNameShortest_t)( LibTiePieHandle_t hDevice , char* pBuffer , uint32_t dwBufferLength );
 #else
 uint32_t DevGetNameShortest( LibTiePieHandle_t hDevice , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \}
+ * \defgroup dev_battery Battery
+ * \{
+ * \brief Device battery related functions
+ */
+
+// Workaround: Without this line Doxygen adds the documentation below to the group above.
+
+/**
+ * \brief Check whether the device has a battery.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return  #BOOL8_TRUE if the device has a battery, #BOOL8_FALSE otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieDevHasBattery_t)(LibTiePieHandle_t hDevice);
+#else
+bool8_t DevHasBattery(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Get battery charge in percent.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return Battery charge in percent if succesful, \c -1 otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not support reading the battery charge or doesn't have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef int8_t(*LibTiePieDevGetBatteryCharge_t)(LibTiePieHandle_t hDevice);
+#else
+int8_t DevGetBatteryCharge(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Get battery time to empty in minutes.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return Battery time to empty in minutes if succesful, \c -1 otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not support reading the battery time to empty or doesn't have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \see DevGetBatteryCharge
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef int32_t(*LibTiePieDevGetBatteryTimeToEmpty_t)(LibTiePieHandle_t hDevice);
+#else
+int32_t DevGetBatteryTimeToEmpty(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Get battery time to full in minutes.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return Battery time to full in minutes if succesful, \c -1 otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not support reading the battery time to full or doesn't have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \see DevIsBatteryCharging
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef int32_t(*LibTiePieDevGetBatteryTimeToFull_t)(LibTiePieHandle_t hDevice);
+#else
+int32_t DevGetBatteryTimeToFull(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Check whether the battery charger is connected.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return #BOOL8_TRUE if the battery charger is connected, #BOOL8_FALSE otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \see DevIsBatteryCharging
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieDevIsBatteryChargerConnected_t)(LibTiePieHandle_t hDevice);
+#else
+bool8_t DevIsBatteryChargerConnected(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Check whether the battery is charging.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return #BOOL8_TRUE if the battery is charging, #BOOL8_FALSE otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \see DevGetBatteryTimeToEmpty
+ * \see DevGetBatteryTimeToFull
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieDevIsBatteryCharging_t)(LibTiePieHandle_t hDevice);
+#else
+bool8_t DevIsBatteryCharging(LibTiePieHandle_t hDevice);
+#endif
+
+/**
+ * \brief Check whether the battery is broken.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the device.
+ * \return #BOOL8_TRUE if the battery is broken, #BOOL8_FALSE otherwise.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The indicated device does not have a battery.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle to the device is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see DevHasBattery
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieDevIsBatteryBroken_t)(LibTiePieHandle_t hDevice);
+#else
+bool8_t DevIsBatteryBroken(LibTiePieHandle_t hDevice);
 #endif
 
 /**
@@ -4894,6 +5441,7 @@ bool8_t ScpChGetEnabled( LibTiePieHandle_t hDevice , uint16_t wCh );
  * \return #BOOL8_TRUE if enabled, #BOOL8_FALSE if disabled.
  * \par Status values
  *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_AVAILABLE "NOT_AVAILABLE"</td>          <td>With the current settings, the requested functionality is not available.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_CHANNEL "INVALID_CHANNEL"</td>        <td>The requested channel number is invalid.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
@@ -8139,7 +8687,7 @@ uint32_t ScpSetClockSource( LibTiePieHandle_t hDevice , uint32_t dwClockSource )
  * \return Total number of supported clock source frequencies, or \c 0 when unsuccessful.
  * \par Status values
  *   <table class="params">
- *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not setto #CS_EXTERNAL.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not set to #CS_EXTERNAL.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
@@ -8218,7 +8766,7 @@ uint32_t ScpGetClockSourceFrequenciesEx( LibTiePieHandle_t hDevice , uint32_t dw
  * \return The current clock source frequency in Hz, or \c 0 when unsuccessful.
  * \par Status values
  *   <table class="params">
- *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not setto #CS_EXTERNAL.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not set to #CS_EXTERNAL.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
@@ -8250,7 +8798,7 @@ double ScpGetClockSourceFrequency( LibTiePieHandle_t hDevice );
  *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_CLIPPED "VALUE_CLIPPED"</td>          <td>The requested clock source frequency is outside the valid range and clipped to the closest limit.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_MODIFIED "VALUE_MODIFIED"</td>         <td>The requested clock source frequency is within the valid range but not available. The closest valid value is set.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>          <td>The requested value is invalid.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not setto #CS_EXTERNAL.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>          <td>The oscilloscope does not support external clock or the clock source is not set to #CS_EXTERNAL.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
@@ -10023,8 +10571,10 @@ void GenGetOutputValueMinMax( LibTiePieHandle_t hDevice , double* pMin , double*
  *
  *         Use GenGetStatus() to check the signal generation status.
  *
- *         Before a signal appears on the generator output, use GenSetOutputOn() to switch the output of the generator on (enable it).
- *         When the output is enabled, but the generator is not started, the output will be at the currently set \ref gen_signalOffset.
+ *         Before a generator can be used, the hardware must be switched on (enabled) using GenSetOutputOn().
+ *         When enabeld, the generator signal properties can be set.
+ *         When the generator hardware is enabled, but the generator is not started, the output will be at the currently set \ref gen_signalOffset.
+ *         When the generator hardware is disabled, the hardware is switched off, resulting in the instrument using less power.
  *
  *         Output invert is not available for all instruments.
  *         Use GenHasOutputInvert() to check whether output invert is available for your instrument.
@@ -10092,10 +10642,10 @@ uint32_t GenGetStatus( LibTiePieHandle_t hDevice );
 #endif
 
 /**
- * \brief Check whether the output of a specified generator is enabled
+ * \brief Check whether a specified generator is enabled
  *
  * \param[in] hDevice A \ref OpenDev "device handle" identifying the generator.
- * \return #BOOL8_TRUE if the output is currently enabled, #BOOL8_FALSE if the output is disabled.
+ * \return #BOOL8_TRUE if the generator hardware is currently enabled, #BOOL8_FALSE if the generator hardware is disabled.
  * \par Status values
  *   <table class="params">
  *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid generator handle.</td></tr>
@@ -10113,11 +10663,11 @@ bool8_t GenGetOutputOn( LibTiePieHandle_t hDevice );
 #endif
 
 /**
- * \brief Enable or disable the output of a specified generator.
+ * \brief Enable or disable the hardware of a specified generator.
  *
  * \param[in] hDevice A \ref OpenDev "device handle" identifying the generator.
- * \param[in] bOutputOn The requested output state, #BOOL8_TRUE to enable the output, #BOOL8_FALSE to disable the output.
- * \return The actually set output state, #BOOL8_TRUE if the output is enabled, #BOOL8_FALSE if the output is disabled.
+ * \param[in] bOutputOn The requested hardware state, #BOOL8_TRUE to enable the hardware, #BOOL8_FALSE to disable the hardware.
+ * \return The actually set hardware state, #BOOL8_TRUE if the hardware is enabled, #BOOL8_FALSE if the hardware is disabled.
  * \par Status values
  *   <table class="params">
  *   <tr><td>\ref LIBTIEPIESTATUS_NOT_CONTROLLABLE "NOT_CONTROLLABLE"</td>       <td>The generator is currently not controllable, see #GenIsControllable.</td></tr>
@@ -14761,7 +15311,6 @@ bool8_t I2CWriteWord( LibTiePieHandle_t hDevice , uint16_t wAddress , uint16_t w
  *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
  *   </table>
- * \see XXX
  * \since 0.6
  */
 #ifdef LIBTIEPIE_DYNAMIC
@@ -14880,6 +15429,201 @@ double I2CVerifySpeed( LibTiePieHandle_t hDevice , double dSpeed );
 //! \endcond
 
 /**
+ * \}
+ * \}
+ * \defgroup srv Server
+ * \{
+ * \brief Functions to communicate with network instruments and instrument servers
+ */
+
+// Workaround: Without this line Doxygen adds the documentation below to the group above.
+
+/**
+ * \brief Connect to a specified network instrument or instrument server.
+ *        This gives access to the network instrument or instruments connected to the instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[in] bAsync Connect asynchronously
+ * \return #BOOL8_TRUE if successful, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieSrvConnect_t)( LibTiePieHandle_t hServer , bool8_t bAsync );
+#else
+bool8_t SrvConnect( LibTiePieHandle_t hServer , bool8_t bAsync );
+#endif
+
+/**
+ * \brief Disconnect from a specified network instrument or instrument server.
+ *        This will close all opened instrument(s).
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[in] bForce If #BOOL8_TRUE all open devices are closed, if #BOOL8_FALSE remove only succeeds if no devices are open.
+ * \return #BOOL8_TRUE if successful, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieSrvDisconnect_t)( LibTiePieHandle_t hServer , bool8_t bForce );
+#else
+bool8_t SrvDisconnect( LibTiePieHandle_t hServer , bool8_t bForce );
+#endif
+
+/**
+ * \brief Remove a specified specified network instrument or instrument server from the list of servers.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[in] bForce If #BOOL8_TRUE all open devices are closed, if #BOOL8_FALSE remove only succeeds if no devices are open.
+ * \return #BOOL8_TRUE if successful, #BOOL8_FALSE otherwise.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef bool8_t(*LibTiePieSrvRemove_t)( LibTiePieHandle_t hServer , bool8_t bForce );
+#else
+bool8_t SrvRemove( LibTiePieHandle_t hServer , bool8_t bForce );
+#endif
+
+/**
+ * \brief Retrieve the status of a specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \return The status of the specified network instrument or instrument server, see LIBTIEPIE_SERVER_STATUS
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetStatus_t)( LibTiePieHandle_t hServer );
+#else
+uint32_t SrvGetStatus( LibTiePieHandle_t hServer );
+#endif
+
+/**
+ * \brief Get the last error from a specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \return The last error given by the specified network instrument or instrument server, see LIBTIEPIE_SERVER_ERROR
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetLastError_t)( LibTiePieHandle_t hServer );
+#else
+uint32_t SrvGetLastError( LibTiePieHandle_t hServer );
+#endif
+
+/**
+ * \brief Get the URL of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[out] pBuffer A pointer to a buffer for the URL.
+ * \param[in] dwBufferLength The length of the buffer, in bytes.
+ * \return The length of the URL in bytes, excluding terminating zero.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetURL_t)( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#else
+uint32_t SrvGetURL( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \brief Get the id of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[out] pBuffer A pointer to a buffer for the id.
+ * \param[in] dwBufferLength The length of the buffer, in bytes.
+ * \return The length of the id in bytes, excluding terminating zero.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetID_t)( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#else
+uint32_t SrvGetID( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \brief Get the IPv4 address of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \return The IPv4 address of the device, or zero if no IPv4 address is available.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetIPv4Address_t)( LibTiePieHandle_t hServer );
+#else
+uint32_t SrvGetIPv4Address( LibTiePieHandle_t hServer );
+#endif
+
+/**
+ * \brief Get the IP port number of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \return The IP port number of the device, or zero if no IP port number is available.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint16_t(*LibTiePieSrvGetIPPort_t)( LibTiePieHandle_t hServer );
+#else
+uint16_t SrvGetIPPort( LibTiePieHandle_t hServer );
+#endif
+
+/**
+ * \brief Get the name of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[out] pBuffer A pointer to a buffer for the name.
+ * \param[in] dwBufferLength The length of the buffer, in bytes.
+ * \return The length of the name in bytes, excluding terminating zero.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetName_t)( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#else
+uint32_t SrvGetName( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \brief Get the description of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[out] pBuffer A pointer to a buffer for the description.
+ * \param[in] dwBufferLength The length of the buffer, in bytes.
+ * \return The length of the description in bytes, excluding terminating zero.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetDescription_t)( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#else
+uint32_t SrvGetDescription( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \brief Get the software version number of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \return The software \ref TpVersion_t "version" number of the server, or zero if no software version is available.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef TpVersion_t(*LibTiePieSrvGetVersion_t)( LibTiePieHandle_t hServer );
+#else
+TpVersion_t SrvGetVersion( LibTiePieHandle_t hServer );
+#endif
+
+/**
+ * \brief Get the software version postfix of the specified network instrument or instrument server.
+ *
+ * \param[in] hServer A server handle identifying the server.
+ * \param[out] pBuffer A pointer to a buffer for the software version postfix.
+ * \param[in] dwBufferLength The length of the buffer, in bytes.
+ * \return The length of the software version postfix in bytes, excluding terminating zero.
+ * \since 0.9
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint32_t(*LibTiePieSrvGetVersionExtra_t)( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#else
+uint32_t SrvGetVersionExtra( LibTiePieHandle_t hServer , char* pBuffer , uint32_t dwBufferLength );
+#endif
+
+/**
+ * \}
  * \}
  * \}
  * \defgroup hlp Helper functions

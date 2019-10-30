@@ -232,7 +232,7 @@ NAN_METHOD(LstDevGetNameWrapper)
   LstDevGetName(idKind, id, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstDevGetNameShortWrapper)
@@ -248,7 +248,7 @@ NAN_METHOD(LstDevGetNameShortWrapper)
   LstDevGetNameShort(idKind, id, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstDevGetNameShortestWrapper)
@@ -264,7 +264,7 @@ NAN_METHOD(LstDevGetNameShortestWrapper)
   LstDevGetNameShortest(idKind, id, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstDevGetDriverVersionWrapper)
@@ -334,6 +334,54 @@ NAN_METHOD(LstDevGetSerialNumberWrapper)
   const uint32_t id = Nan::To<uint32_t>(info[1]).FromJust();
 
   const uint32_t result = LstDevGetSerialNumber(idKind, id);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(LstDevGetIPv4AddressWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const uint32_t idKind = Nan::To<uint32_t>(info[0]).FromJust();
+  const uint32_t id = Nan::To<uint32_t>(info[1]).FromJust();
+
+  const uint32_t result = LstDevGetIPv4Address(idKind, id);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(LstDevGetIPPortWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const uint32_t idKind = Nan::To<uint32_t>(info[0]).FromJust();
+  const uint32_t id = Nan::To<uint32_t>(info[1]).FromJust();
+
+  const uint16_t result = LstDevGetIPPort(idKind, id);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set((uint32_t)result);
+}
+
+NAN_METHOD(LstDevHasServerWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const uint32_t idKind = Nan::To<uint32_t>(info[0]).FromJust();
+  const uint32_t id = Nan::To<uint32_t>(info[1]).FromJust();
+
+  const bool8_t result = LstDevHasServer(idKind, id);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(LstDevGetServerWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const uint32_t idKind = Nan::To<uint32_t>(info[0]).FromJust();
+  const uint32_t id = Nan::To<uint32_t>(info[1]).FromJust();
+
+  const LibTiePieHandle_t result = LstDevGetServer(idKind, id);
   CHECK_LAST_STATUS();
 
   info.GetReturnValue().Set(result);
@@ -410,7 +458,7 @@ NAN_METHOD(LstCbDevGetNameWrapper)
   LstCbDevGetName(idKind, id, containedDeviceSerialNumber, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstCbDevGetNameShortWrapper)
@@ -427,7 +475,7 @@ NAN_METHOD(LstCbDevGetNameShortWrapper)
   LstCbDevGetNameShort(idKind, id, containedDeviceSerialNumber, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstCbDevGetNameShortestWrapper)
@@ -444,7 +492,7 @@ NAN_METHOD(LstCbDevGetNameShortestWrapper)
   LstCbDevGetNameShortest(idKind, id, containedDeviceSerialNumber, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(LstCbDevGetDriverVersionWrapper)
@@ -497,6 +545,73 @@ NAN_METHOD(LstCbScpGetChannelCountWrapper)
   CHECK_LAST_STATUS();
 
   info.GetReturnValue().Set((uint32_t)result);
+}
+
+NAN_METHOD(NetGetAutoDetectEnabledWrapper)
+{
+  CHECK_PARAMETER_COUNT(0);
+
+  const bool8_t result = NetGetAutoDetectEnabled();
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(NetSetAutoDetectEnabledWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const bool enable = Nan::To<bool>(info[0]).FromJust();
+
+  const bool8_t result = NetSetAutoDetectEnabled(enable ? BOOL8_TRUE : BOOL8_FALSE);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(NetSrvRemoveWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  std::string url(*Nan::Utf8String(info[0]));
+  const uint32_t urlLength = LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED;
+  const bool force = Nan::To<bool>(info[2]).FromJust();
+
+  const bool8_t result = NetSrvRemove(url.c_str(), urlLength, force ? BOOL8_TRUE : BOOL8_FALSE);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(NetSrvGetCountWrapper)
+{
+  CHECK_PARAMETER_COUNT(0);
+
+  const uint32_t result = NetSrvGetCount();
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(NetSrvGetByIndexWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const uint32_t index = Nan::To<uint32_t>(info[0]).FromJust();
+
+  const LibTiePieHandle_t result = NetSrvGetByIndex(index);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(NetSrvGetByURLWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  std::string url(*Nan::Utf8String(info[0]));
+  const uint32_t urlLength = LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED;
+
+  const LibTiePieHandle_t result = NetSrvGetByURL(url.c_str(), urlLength);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
 }
 
 NAN_METHOD(ObjCloseWrapper)
@@ -577,7 +692,7 @@ NAN_METHOD(DevGetCalibrationTokenWrapper)
   DevGetCalibrationToken(device, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(DevGetSerialNumberWrapper)
@@ -589,6 +704,28 @@ NAN_METHOD(DevGetSerialNumberWrapper)
   CHECK_LAST_STATUS();
 
   info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(DevGetIPv4AddressWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t result = DevGetIPv4Address(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(DevGetIPPortWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint16_t result = DevGetIPPort(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set((uint32_t)result);
 }
 
 NAN_METHOD(DevGetProductIdWrapper)
@@ -636,7 +773,7 @@ NAN_METHOD(DevGetNameWrapper)
   DevGetName(device, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(DevGetNameShortWrapper)
@@ -651,7 +788,7 @@ NAN_METHOD(DevGetNameShortWrapper)
   DevGetNameShort(device, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(DevGetNameShortestWrapper)
@@ -666,7 +803,84 @@ NAN_METHOD(DevGetNameShortestWrapper)
   DevGetNameShortest(device, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
+NAN_METHOD(DevHasBatteryWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const bool8_t result = DevHasBattery(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(DevGetBatteryChargeWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const int8_t result = DevGetBatteryCharge(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set((int32_t)result);
+}
+
+NAN_METHOD(DevGetBatteryTimeToEmptyWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const int32_t result = DevGetBatteryTimeToEmpty(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(DevGetBatteryTimeToFullWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const int32_t result = DevGetBatteryTimeToFull(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(DevIsBatteryChargerConnectedWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const bool8_t result = DevIsBatteryChargerConnected(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(DevIsBatteryChargingWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const bool8_t result = DevIsBatteryCharging(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(DevIsBatteryBrokenWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t device = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const bool8_t result = DevIsBatteryBroken(device);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
 }
 
 NAN_METHOD(DevTrGetInputCountWrapper)
@@ -812,7 +1026,7 @@ NAN_METHOD(DevTrInGetNameWrapper)
   DevTrInGetName(device, input, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(DevTrGetOutputCountWrapper)
@@ -892,7 +1106,7 @@ NAN_METHOD(DevTrOutGetNameWrapper)
   DevTrOutGetName(device, output, &s[0], length);
   CHECK_LAST_STATUS();
 
-  info.GetReturnValue().Set(Nan::New(&s[0]).ToLocalChecked());
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
 }
 
 NAN_METHOD(DevTrOutTriggerWrapper)
@@ -3586,6 +3800,172 @@ NAN_METHOD(GenVerifyBurstSegmentCountWrapper)
   info.GetReturnValue().Set((uint32_t)result);
 }
 
+NAN_METHOD(SrvConnectWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+  const bool async = Nan::To<bool>(info[1]).FromJust();
+
+  const bool8_t result = SrvConnect(server, async ? BOOL8_TRUE : BOOL8_FALSE);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(SrvDisconnectWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+  const bool force = Nan::To<bool>(info[1]).FromJust();
+
+  const bool8_t result = SrvDisconnect(server, force ? BOOL8_TRUE : BOOL8_FALSE);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(SrvRemoveWrapper)
+{
+  CHECK_PARAMETER_COUNT(2);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+  const bool force = Nan::To<bool>(info[1]).FromJust();
+
+  const bool8_t result = SrvRemove(server, force ? BOOL8_TRUE : BOOL8_FALSE);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result != BOOL8_FALSE);
+}
+
+NAN_METHOD(SrvGetStatusWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t result = SrvGetStatus(server);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(SrvGetLastErrorWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t result = SrvGetLastError(server);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(SrvGetURLWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t length = SrvGetURL(server, 0, 0);
+  CHECK_LAST_STATUS();
+  std::vector<char> s;
+  s.resize(length);
+  SrvGetURL(server, &s[0], length);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
+NAN_METHOD(SrvGetIDWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t length = SrvGetID(server, 0, 0);
+  CHECK_LAST_STATUS();
+  std::vector<char> s;
+  s.resize(length);
+  SrvGetID(server, &s[0], length);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
+NAN_METHOD(SrvGetIPv4AddressWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t result = SrvGetIPv4Address(server);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(SrvGetIPPortWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint16_t result = SrvGetIPPort(server);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set((uint32_t)result);
+}
+
+NAN_METHOD(SrvGetNameWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t length = SrvGetName(server, 0, 0);
+  CHECK_LAST_STATUS();
+  std::vector<char> s;
+  s.resize(length);
+  SrvGetName(server, &s[0], length);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
+NAN_METHOD(SrvGetDescriptionWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t length = SrvGetDescription(server, 0, 0);
+  CHECK_LAST_STATUS();
+  std::vector<char> s;
+  s.resize(length);
+  SrvGetDescription(server, &s[0], length);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
+NAN_METHOD(SrvGetVersionWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const TpVersion_t result = SrvGetVersion(server);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(tpVersionToStr(result)).ToLocalChecked());
+}
+
+NAN_METHOD(SrvGetVersionExtraWrapper)
+{
+  CHECK_PARAMETER_COUNT(1);
+  const LibTiePieHandle_t server = Nan::To<LibTiePieHandle_t>(info[0]).FromJust();
+
+  const uint32_t length = SrvGetVersionExtra(server, 0, 0);
+  CHECK_LAST_STATUS();
+  std::vector<char> s;
+  s.resize(length);
+  SrvGetVersionExtra(server, &s[0], length);
+  CHECK_LAST_STATUS();
+
+  info.GetReturnValue().Set(Nan::New(&s[0], length).ToLocalChecked());
+}
+
 NAN_MODULE_INIT(init)
 {
   v8::Local<v8::Array> api = Nan::New<v8::Array>();
@@ -3613,6 +3993,10 @@ NAN_MODULE_INIT(init)
   Nan::Set(api, Nan::New<v8::String>("LstDevGetRecommendedFirmwareVersion").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetRecommendedFirmwareVersionWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstDevGetCalibrationDate").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetCalibrationDateWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstDevGetSerialNumber").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetSerialNumberWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("LstDevGetIPv4Address").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetIPv4AddressWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("LstDevGetIPPort").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetIPPortWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("LstDevHasServer").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevHasServerWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("LstDevGetServer").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetServerWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstDevGetTypes").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetTypesWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstDevGetContainedSerialNumbers").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstDevGetContainedSerialNumbersWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstCbDevGetProductId").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstCbDevGetProductIdWrapper)->GetFunction());
@@ -3624,6 +4008,12 @@ NAN_MODULE_INIT(init)
   Nan::Set(api, Nan::New<v8::String>("LstCbDevGetFirmwareVersion").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstCbDevGetFirmwareVersionWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstCbDevGetCalibrationDate").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstCbDevGetCalibrationDateWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("LstCbScpGetChannelCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(LstCbScpGetChannelCountWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetGetAutoDetectEnabled").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetGetAutoDetectEnabledWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetSetAutoDetectEnabled").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetSetAutoDetectEnabledWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetSrvRemove").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetSrvRemoveWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetSrvGetCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetSrvGetCountWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetSrvGetByIndex").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetSrvGetByIndexWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("NetSrvGetByURL").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(NetSrvGetByURLWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("ObjClose").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(ObjCloseWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("ObjIsRemoved").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(ObjIsRemovedWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("ObjGetInterfaces").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(ObjGetInterfacesWrapper)->GetFunction());
@@ -3632,12 +4022,21 @@ NAN_MODULE_INIT(init)
   Nan::Set(api, Nan::New<v8::String>("DevGetCalibrationDate").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetCalibrationDateWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetCalibrationToken").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetCalibrationTokenWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetSerialNumber").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetSerialNumberWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevGetIPv4Address").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetIPv4AddressWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevGetIPPort").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetIPPortWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetProductId").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetProductIdWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetVendorId").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetVendorIdWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetType").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetTypeWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetName").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetNameWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetNameShort").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetNameShortWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevGetNameShortest").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetNameShortestWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevHasBattery").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevHasBatteryWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevGetBatteryCharge").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetBatteryChargeWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevGetBatteryTimeToEmpty").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetBatteryTimeToEmptyWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevGetBatteryTimeToFull").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevGetBatteryTimeToFullWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevIsBatteryChargerConnected").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevIsBatteryChargerConnectedWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevIsBatteryCharging").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevIsBatteryChargingWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("DevIsBatteryBroken").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevIsBatteryBrokenWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevTrGetInputCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevTrGetInputCountWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("DevTrGetInputIndexById").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(DevTrGetInputIndexByIdWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("ScpTrInIsTriggered").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(ScpTrInIsTriggeredWrapper)->GetFunction());
@@ -3875,6 +4274,19 @@ NAN_MODULE_INIT(init)
   Nan::Set(api, Nan::New<v8::String>("GenGetBurstSegmentCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GenGetBurstSegmentCountWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("GenSetBurstSegmentCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GenSetBurstSegmentCountWrapper)->GetFunction());
   Nan::Set(api, Nan::New<v8::String>("GenVerifyBurstSegmentCount").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GenVerifyBurstSegmentCountWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvConnect").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvConnectWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvDisconnect").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvDisconnectWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvRemove").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvRemoveWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetStatus").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetStatusWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetLastError").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetLastErrorWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetURL").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetURLWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetID").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetIDWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetIPv4Address").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetIPv4AddressWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetIPPort").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetIPPortWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetName").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetNameWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetDescription").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetDescriptionWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetVersion").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetVersionWrapper)->GetFunction());
+  Nan::Set(api, Nan::New<v8::String>("SrvGetVersionExtra").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SrvGetVersionExtraWrapper)->GetFunction());
 
   v8::Local<v8::Array> constants = Nan::New<v8::Array>();
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_VERSION_MAJOR").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_VERSION_MAJOR), v8::ReadOnly);
@@ -3888,6 +4300,7 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_INTERFACE_OSCILLOSCOPE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_INTERFACE_OSCILLOSCOPE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_INTERFACE_GENERATOR").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_INTERFACE_GENERATOR), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_INTERFACE_I2CHOST").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_INTERFACE_I2CHOST), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_INTERFACE_SERVER").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_INTERFACE_SERVER), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("DEVICETYPE_OSCILLOSCOPE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)DEVICETYPE_OSCILLOSCOPE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("DEVICETYPE_GENERATOR").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)DEVICETYPE_GENERATOR), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("DEVICETYPE_I2CHOST").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)DEVICETYPE_I2CHOST), v8::ReadOnly);
@@ -3958,6 +4371,16 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("DATARAWTYPE_MASK_FIXED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)DATARAWTYPE_MASK_FIXED), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_TRIGGERIO_INDEX_INVALID").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_TRIGGERIO_INDEX_INVALID), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_STRING_LENGTH_NULL_TERMINATED), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_STATUS_DISCONNECTED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_STATUS_DISCONNECTED), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_STATUS_CONNECTING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_STATUS_CONNECTING), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_STATUS_CONNECTED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_STATUS_CONNECTED), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_STATUS_DISCONNECTING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_STATUS_DISCONNECTING), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_NONE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_NONE), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_UNKNOWN").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_UNKNOWN), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_CONNECTIONREFUSED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_CONNECTIONREFUSED), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_NETWORKUNREACHABLE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_NETWORKUNREACHABLE), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_TIMEDOUT").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_TIMEDOUT), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_SERVER_ERROR_HOSTNAMELOOKUPFAILED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_SERVER_ERROR_HOSTNAMELOOKUPFAILED), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("LIBTIEPIE_RANGEINDEX_AUTO").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)LIBTIEPIE_RANGEINDEX_AUTO), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("ARN_COUNT").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)ARN_COUNT), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("ARB_DISABLED").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)ARB_DISABLED), v8::ReadOnly);
@@ -4167,6 +4590,8 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKB_RUNTPULSEPOSITIVE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKB_RUNTPULSEPOSITIVE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKB_RUNTPULSENEGATIVE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKB_RUNTPULSENEGATIVE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKB_RUNTPULSEEITHER").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKB_RUNTPULSEEITHER), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKB_INTERVALRISING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKB_INTERVALRISING), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKB_INTERVALFALLING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKB_INTERVALFALLING), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_UNKNOWN").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_UNKNOWN), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_RISINGEDGE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_RISINGEDGE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_FALLINGEDGE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_FALLINGEDGE), v8::ReadOnly);
@@ -4181,12 +4606,15 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_RUNTPULSEPOSITIVE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_RUNTPULSEPOSITIVE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_RUNTPULSENEGATIVE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_RUNTPULSENEGATIVE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_RUNTPULSEEITHER").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_RUNTPULSEEITHER), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_INTERVALRISING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_INTERVALRISING), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TK_INTERVALFALLING").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TK_INTERVALFALLING), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_NONE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_NONE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_EDGE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_EDGE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_WINDOW").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_WINDOW), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_PULSEWIDTH").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_PULSEWIDTH), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_RUNTPULSE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_RUNTPULSE), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_PULSE").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_PULSE), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_INTERVAL").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_INTERVAL), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_TIME").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_TIME), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TKM_ALL").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TKM_ALL), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("TLMN_COUNT").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)TLMN_COUNT), v8::ReadOnly);
@@ -4227,6 +4655,8 @@ NAN_MODULE_INIT(init)
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("PID_HS6D").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)PID_HS6D), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("PID_ATS610004D").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)PID_ATS610004D), v8::ReadOnly);
   Nan::DefineOwnProperty(constants, Nan::New<v8::String>("PID_ATS605004D").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)PID_ATS605004D), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("PID_WS6").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)PID_WS6), v8::ReadOnly);
+  Nan::DefineOwnProperty(constants, Nan::New<v8::String>("PID_WS5").ToLocalChecked(), Nan::New<v8::Uint32>((uint32_t)PID_WS5), v8::ReadOnly);
 
   Nan::Set(target, Nan::New<v8::String>("const").ToLocalChecked(), constants);
   Nan::Set(target, Nan::New<v8::String>("api").ToLocalChecked(), api);

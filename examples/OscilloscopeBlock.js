@@ -13,6 +13,9 @@ const sleep = require('sleep');
 const fs = require('fs');
 const EOL = require('os').EOL;
 
+// Enable network search:
+libtiepie.api.NetSetAutoDetectEnabled(true);
+
 // Update device list:
 libtiepie.api.LstUpdate();
 
