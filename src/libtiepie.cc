@@ -79,7 +79,7 @@ NAN_METHOD(LibGetConfigWrapper)
   LibGetConfig(&buffer[0], length);
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -413,7 +413,7 @@ NAN_METHOD(LstDevGetContainedSerialNumbersWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1200,7 +1200,7 @@ NAN_METHOD(ScpChGetBandwidthsWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1395,7 +1395,7 @@ NAN_METHOD(ScpChGetRangesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -1889,11 +1889,11 @@ NAN_METHOD(ScpGetDataWrapper)
     {
       v8::Local<v8::Array> tmp = Nan::New<v8::Array>();
       for(uint_fast64_t j = 0; j < sampleCount; ++j)
-        tmp->Set((uint32_t)j, Nan::New<v8::Number>(buffers[i][j]));
-      result->Set(i, tmp);
+        Nan::Set(tmp, (uint32_t)j, Nan::New<v8::Number>(buffers[i][j]));
+      Nan::Set(result, i, tmp);
     }
     else
-      result->Set(i, Nan::Undefined());
+      Nan::Set(result, i, Nan::Undefined());
   }
 
   info.GetReturnValue().Set(result);
@@ -2129,7 +2129,7 @@ NAN_METHOD(ScpGetResolutionsWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Uint32>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -2216,7 +2216,7 @@ NAN_METHOD(ScpGetClockSourceFrequenciesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -2291,7 +2291,7 @@ NAN_METHOD(ScpGetClockOutputFrequenciesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
@@ -2690,9 +2690,9 @@ NAN_METHOD(ScpGetConnectionTestDataWrapper)
   for(uint_fast16_t i = 0; i < channelCount; ++i)
   {
     if(i < elementsWritten || buffer[i] == LIBTIEPIE_TRISTATE_UNDEFINED)
-      result->Set(i, buffer[i] == LIBTIEPIE_TRISTATE_TRUE ? Nan::True() : Nan::False());
+      Nan::Set(result, i, buffer[i] == LIBTIEPIE_TRISTATE_TRUE ? Nan::True() : Nan::False());
     else
-      result->Set(i, Nan::Undefined());
+      Nan::Set(result, i, Nan::Undefined());
   }
 
   info.GetReturnValue().Set(result);
@@ -2991,7 +2991,7 @@ NAN_METHOD(GenGetAmplitudeRangesWrapper)
   CHECK_LAST_STATUS();
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for(uint64_t i = 0; i < length; ++i)
-    result->Set((uint32_t)i, Nan::New<v8::Number>(buffer[i]));
+    Nan::Set(result, (uint32_t)i, Nan::New<v8::Number>(buffer[i]));
 
   info.GetReturnValue().Set(result);
 }
