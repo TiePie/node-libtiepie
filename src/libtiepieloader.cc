@@ -39,6 +39,10 @@ LibTiePieLstDevGetFirmwareVersion_t LstDevGetFirmwareVersion;
 LibTiePieLstDevGetRecommendedFirmwareVersion_t LstDevGetRecommendedFirmwareVersion;
 LibTiePieLstDevGetCalibrationDate_t LstDevGetCalibrationDate;
 LibTiePieLstDevGetSerialNumber_t LstDevGetSerialNumber;
+LibTiePieLstDevGetIPv4Address_t LstDevGetIPv4Address;
+LibTiePieLstDevGetIPPort_t LstDevGetIPPort;
+LibTiePieLstDevHasServer_t LstDevHasServer;
+LibTiePieLstDevGetServer_t LstDevGetServer;
 LibTiePieLstDevGetTypes_t LstDevGetTypes;
 LibTiePieLstDevGetContainedSerialNumbers_t LstDevGetContainedSerialNumbers;
 LibTiePieLstCbDevGetProductId_t LstCbDevGetProductId;
@@ -66,6 +70,21 @@ LibTiePieLstSetMessageDeviceAdded_t LstSetMessageDeviceAdded;
 LibTiePieLstSetMessageDeviceRemoved_t LstSetMessageDeviceRemoved;
 LibTiePieLstSetMessageDeviceCanOpenChanged_t LstSetMessageDeviceCanOpenChanged;
 #endif
+LibTiePieNetGetAutoDetectEnabled_t NetGetAutoDetectEnabled;
+LibTiePieNetSetAutoDetectEnabled_t NetSetAutoDetectEnabled;
+LibTiePieNetSrvAdd_t NetSrvAdd;
+LibTiePieNetSrvRemove_t NetSrvRemove;
+LibTiePieNetSrvGetCount_t NetSrvGetCount;
+LibTiePieNetSrvGetByIndex_t NetSrvGetByIndex;
+LibTiePieNetSrvGetByURL_t NetSrvGetByURL;
+LibTiePieNetSrvSetCallbackAdded_t NetSrvSetCallbackAdded;
+#ifdef LIBTIEPIE_LINUX
+LibTiePieNetSrvSetEventAdded_t NetSrvSetEventAdded;
+#endif
+#ifdef LIBTIEPIE_WINDOWS
+LibTiePieNetSrvSetEventAdded_t NetSrvSetEventAdded;
+LibTiePieNetSrvSetMessageAdded_t NetSrvSetMessageAdded;
+#endif
 LibTiePieObjClose_t ObjClose;
 LibTiePieObjIsRemoved_t ObjIsRemoved;
 LibTiePieObjGetInterfaces_t ObjGetInterfaces;
@@ -85,12 +104,21 @@ LibTiePieDevGetFirmwareVersion_t DevGetFirmwareVersion;
 LibTiePieDevGetCalibrationDate_t DevGetCalibrationDate;
 LibTiePieDevGetCalibrationToken_t DevGetCalibrationToken;
 LibTiePieDevGetSerialNumber_t DevGetSerialNumber;
+LibTiePieDevGetIPv4Address_t DevGetIPv4Address;
+LibTiePieDevGetIPPort_t DevGetIPPort;
 LibTiePieDevGetProductId_t DevGetProductId;
 LibTiePieDevGetVendorId_t DevGetVendorId;
 LibTiePieDevGetType_t DevGetType;
 LibTiePieDevGetName_t DevGetName;
 LibTiePieDevGetNameShort_t DevGetNameShort;
 LibTiePieDevGetNameShortest_t DevGetNameShortest;
+LibTiePieDevHasBattery_t DevHasBattery;
+LibTiePieDevGetBatteryCharge_t DevGetBatteryCharge;
+LibTiePieDevGetBatteryTimeToEmpty_t DevGetBatteryTimeToEmpty;
+LibTiePieDevGetBatteryTimeToFull_t DevGetBatteryTimeToFull;
+LibTiePieDevIsBatteryChargerConnected_t DevIsBatteryChargerConnected;
+LibTiePieDevIsBatteryCharging_t DevIsBatteryCharging;
+LibTiePieDevIsBatteryBroken_t DevIsBatteryBroken;
 LibTiePieDevSetCallbackRemoved_t DevSetCallbackRemoved;
 #ifdef LIBTIEPIE_LINUX
 LibTiePieDevSetEventRemoved_t DevSetEventRemoved;
@@ -478,6 +506,19 @@ LibTiePieI2CGetSpeedMax_t I2CGetSpeedMax;
 LibTiePieI2CGetSpeed_t I2CGetSpeed;
 LibTiePieI2CSetSpeed_t I2CSetSpeed;
 LibTiePieI2CVerifySpeed_t I2CVerifySpeed;
+LibTiePieSrvConnect_t SrvConnect;
+LibTiePieSrvDisconnect_t SrvDisconnect;
+LibTiePieSrvRemove_t SrvRemove;
+LibTiePieSrvGetStatus_t SrvGetStatus;
+LibTiePieSrvGetLastError_t SrvGetLastError;
+LibTiePieSrvGetURL_t SrvGetURL;
+LibTiePieSrvGetID_t SrvGetID;
+LibTiePieSrvGetIPv4Address_t SrvGetIPv4Address;
+LibTiePieSrvGetIPPort_t SrvGetIPPort;
+LibTiePieSrvGetName_t SrvGetName;
+LibTiePieSrvGetDescription_t SrvGetDescription;
+LibTiePieSrvGetVersion_t SrvGetVersion;
+LibTiePieSrvGetVersionExtra_t SrvGetVersionExtra;
 LibTiePieHlpPointerArrayNew_t HlpPointerArrayNew;
 LibTiePieHlpPointerArraySet_t HlpPointerArraySet;
 LibTiePieHlpPointerArrayDelete_t HlpPointerArrayDelete;
@@ -537,6 +578,10 @@ LibTiePieStatus_t LibTiePieLoad( const char* pLibrary )
       LstDevGetRecommendedFirmwareVersion = (LibTiePieLstDevGetRecommendedFirmwareVersion_t) GetLibSym( hLibTiePie , "LstDevGetRecommendedFirmwareVersion" );
       LstDevGetCalibrationDate = (LibTiePieLstDevGetCalibrationDate_t) GetLibSym( hLibTiePie , "LstDevGetCalibrationDate" );
       LstDevGetSerialNumber = (LibTiePieLstDevGetSerialNumber_t) GetLibSym( hLibTiePie , "LstDevGetSerialNumber" );
+      LstDevGetIPv4Address = (LibTiePieLstDevGetIPv4Address_t) GetLibSym( hLibTiePie , "LstDevGetIPv4Address" );
+      LstDevGetIPPort = (LibTiePieLstDevGetIPPort_t) GetLibSym( hLibTiePie , "LstDevGetIPPort" );
+      LstDevHasServer = (LibTiePieLstDevHasServer_t) GetLibSym( hLibTiePie , "LstDevHasServer" );
+      LstDevGetServer = (LibTiePieLstDevGetServer_t) GetLibSym( hLibTiePie , "LstDevGetServer" );
       LstDevGetTypes = (LibTiePieLstDevGetTypes_t) GetLibSym( hLibTiePie , "LstDevGetTypes" );
       LstDevGetContainedSerialNumbers = (LibTiePieLstDevGetContainedSerialNumbers_t) GetLibSym( hLibTiePie , "LstDevGetContainedSerialNumbers" );
       LstCbDevGetProductId = (LibTiePieLstCbDevGetProductId_t) GetLibSym( hLibTiePie , "LstCbDevGetProductId" );
@@ -564,6 +609,21 @@ LibTiePieStatus_t LibTiePieLoad( const char* pLibrary )
       LstSetMessageDeviceRemoved = (LibTiePieLstSetMessageDeviceRemoved_t) GetLibSym( hLibTiePie , "LstSetMessageDeviceRemoved" );
       LstSetMessageDeviceCanOpenChanged = (LibTiePieLstSetMessageDeviceCanOpenChanged_t) GetLibSym( hLibTiePie , "LstSetMessageDeviceCanOpenChanged" );
 #endif
+      NetGetAutoDetectEnabled = (LibTiePieNetGetAutoDetectEnabled_t) GetLibSym( hLibTiePie , "NetGetAutoDetectEnabled" );
+      NetSetAutoDetectEnabled = (LibTiePieNetSetAutoDetectEnabled_t) GetLibSym( hLibTiePie , "NetSetAutoDetectEnabled" );
+      NetSrvAdd = (LibTiePieNetSrvAdd_t) GetLibSym( hLibTiePie , "NetSrvAdd" );
+      NetSrvRemove = (LibTiePieNetSrvRemove_t) GetLibSym( hLibTiePie , "NetSrvRemove" );
+      NetSrvGetCount = (LibTiePieNetSrvGetCount_t) GetLibSym( hLibTiePie , "NetSrvGetCount" );
+      NetSrvGetByIndex = (LibTiePieNetSrvGetByIndex_t) GetLibSym( hLibTiePie , "NetSrvGetByIndex" );
+      NetSrvGetByURL = (LibTiePieNetSrvGetByURL_t) GetLibSym( hLibTiePie , "NetSrvGetByURL" );
+      NetSrvSetCallbackAdded = (LibTiePieNetSrvSetCallbackAdded_t) GetLibSym( hLibTiePie , "NetSrvSetCallbackAdded" );
+#ifdef LIBTIEPIE_LINUX
+      NetSrvSetEventAdded = (LibTiePieNetSrvSetEventAdded_t) GetLibSym( hLibTiePie , "NetSrvSetEventAdded" );
+#endif
+#ifdef LIBTIEPIE_WINDOWS
+      NetSrvSetEventAdded = (LibTiePieNetSrvSetEventAdded_t) GetLibSym( hLibTiePie , "NetSrvSetEventAdded" );
+      NetSrvSetMessageAdded = (LibTiePieNetSrvSetMessageAdded_t) GetLibSym( hLibTiePie , "NetSrvSetMessageAdded" );
+#endif
       ObjClose = (LibTiePieObjClose_t) GetLibSym( hLibTiePie , "ObjClose" );
       ObjIsRemoved = (LibTiePieObjIsRemoved_t) GetLibSym( hLibTiePie , "ObjIsRemoved" );
       ObjGetInterfaces = (LibTiePieObjGetInterfaces_t) GetLibSym( hLibTiePie , "ObjGetInterfaces" );
@@ -583,12 +643,21 @@ LibTiePieStatus_t LibTiePieLoad( const char* pLibrary )
       DevGetCalibrationDate = (LibTiePieDevGetCalibrationDate_t) GetLibSym( hLibTiePie , "DevGetCalibrationDate" );
       DevGetCalibrationToken = (LibTiePieDevGetCalibrationToken_t) GetLibSym( hLibTiePie , "DevGetCalibrationToken" );
       DevGetSerialNumber = (LibTiePieDevGetSerialNumber_t) GetLibSym( hLibTiePie , "DevGetSerialNumber" );
+      DevGetIPv4Address = (LibTiePieDevGetIPv4Address_t) GetLibSym( hLibTiePie , "DevGetIPv4Address" );
+      DevGetIPPort = (LibTiePieDevGetIPPort_t) GetLibSym( hLibTiePie , "DevGetIPPort" );
       DevGetProductId = (LibTiePieDevGetProductId_t) GetLibSym( hLibTiePie , "DevGetProductId" );
       DevGetVendorId = (LibTiePieDevGetVendorId_t) GetLibSym( hLibTiePie , "DevGetVendorId" );
       DevGetType = (LibTiePieDevGetType_t) GetLibSym( hLibTiePie , "DevGetType" );
       DevGetName = (LibTiePieDevGetName_t) GetLibSym( hLibTiePie , "DevGetName" );
       DevGetNameShort = (LibTiePieDevGetNameShort_t) GetLibSym( hLibTiePie , "DevGetNameShort" );
       DevGetNameShortest = (LibTiePieDevGetNameShortest_t) GetLibSym( hLibTiePie , "DevGetNameShortest" );
+      DevHasBattery = (LibTiePieDevHasBattery_t) GetLibSym( hLibTiePie , "DevHasBattery" );
+      DevGetBatteryCharge = (LibTiePieDevGetBatteryCharge_t) GetLibSym( hLibTiePie , "DevGetBatteryCharge" );
+      DevGetBatteryTimeToEmpty = (LibTiePieDevGetBatteryTimeToEmpty_t) GetLibSym( hLibTiePie , "DevGetBatteryTimeToEmpty" );
+      DevGetBatteryTimeToFull = (LibTiePieDevGetBatteryTimeToFull_t) GetLibSym( hLibTiePie , "DevGetBatteryTimeToFull" );
+      DevIsBatteryChargerConnected = (LibTiePieDevIsBatteryChargerConnected_t) GetLibSym( hLibTiePie , "DevIsBatteryChargerConnected" );
+      DevIsBatteryCharging = (LibTiePieDevIsBatteryCharging_t) GetLibSym( hLibTiePie , "DevIsBatteryCharging" );
+      DevIsBatteryBroken = (LibTiePieDevIsBatteryBroken_t) GetLibSym( hLibTiePie , "DevIsBatteryBroken" );
       DevSetCallbackRemoved = (LibTiePieDevSetCallbackRemoved_t) GetLibSym( hLibTiePie , "DevSetCallbackRemoved" );
 #ifdef LIBTIEPIE_LINUX
       DevSetEventRemoved = (LibTiePieDevSetEventRemoved_t) GetLibSym( hLibTiePie , "DevSetEventRemoved" );
@@ -976,6 +1045,19 @@ LibTiePieStatus_t LibTiePieLoad( const char* pLibrary )
       I2CGetSpeed = (LibTiePieI2CGetSpeed_t) GetLibSym( hLibTiePie , "I2CGetSpeed" );
       I2CSetSpeed = (LibTiePieI2CSetSpeed_t) GetLibSym( hLibTiePie , "I2CSetSpeed" );
       I2CVerifySpeed = (LibTiePieI2CVerifySpeed_t) GetLibSym( hLibTiePie , "I2CVerifySpeed" );
+      SrvConnect = (LibTiePieSrvConnect_t) GetLibSym( hLibTiePie , "SrvConnect" );
+      SrvDisconnect = (LibTiePieSrvDisconnect_t) GetLibSym( hLibTiePie , "SrvDisconnect" );
+      SrvRemove = (LibTiePieSrvRemove_t) GetLibSym( hLibTiePie , "SrvRemove" );
+      SrvGetStatus = (LibTiePieSrvGetStatus_t) GetLibSym( hLibTiePie , "SrvGetStatus" );
+      SrvGetLastError = (LibTiePieSrvGetLastError_t) GetLibSym( hLibTiePie , "SrvGetLastError" );
+      SrvGetURL = (LibTiePieSrvGetURL_t) GetLibSym( hLibTiePie , "SrvGetURL" );
+      SrvGetID = (LibTiePieSrvGetID_t) GetLibSym( hLibTiePie , "SrvGetID" );
+      SrvGetIPv4Address = (LibTiePieSrvGetIPv4Address_t) GetLibSym( hLibTiePie , "SrvGetIPv4Address" );
+      SrvGetIPPort = (LibTiePieSrvGetIPPort_t) GetLibSym( hLibTiePie , "SrvGetIPPort" );
+      SrvGetName = (LibTiePieSrvGetName_t) GetLibSym( hLibTiePie , "SrvGetName" );
+      SrvGetDescription = (LibTiePieSrvGetDescription_t) GetLibSym( hLibTiePie , "SrvGetDescription" );
+      SrvGetVersion = (LibTiePieSrvGetVersion_t) GetLibSym( hLibTiePie , "SrvGetVersion" );
+      SrvGetVersionExtra = (LibTiePieSrvGetVersionExtra_t) GetLibSym( hLibTiePie , "SrvGetVersionExtra" );
       HlpPointerArrayNew = (LibTiePieHlpPointerArrayNew_t) GetLibSym( hLibTiePie , "HlpPointerArrayNew" );
       HlpPointerArraySet = (LibTiePieHlpPointerArraySet_t) GetLibSym( hLibTiePie , "HlpPointerArraySet" );
       HlpPointerArrayDelete = (LibTiePieHlpPointerArrayDelete_t) GetLibSym( hLibTiePie , "HlpPointerArrayDelete" );
@@ -1020,6 +1102,10 @@ LibTiePieStatus_t LibTiePieUnload()
     LstDevGetRecommendedFirmwareVersion = 0;
     LstDevGetCalibrationDate = 0;
     LstDevGetSerialNumber = 0;
+    LstDevGetIPv4Address = 0;
+    LstDevGetIPPort = 0;
+    LstDevHasServer = 0;
+    LstDevGetServer = 0;
     LstDevGetTypes = 0;
     LstDevGetContainedSerialNumbers = 0;
     LstCbDevGetProductId = 0;
@@ -1047,6 +1133,21 @@ LibTiePieStatus_t LibTiePieUnload()
     LstSetMessageDeviceRemoved = 0;
     LstSetMessageDeviceCanOpenChanged = 0;
 #endif
+    NetGetAutoDetectEnabled = 0;
+    NetSetAutoDetectEnabled = 0;
+    NetSrvAdd = 0;
+    NetSrvRemove = 0;
+    NetSrvGetCount = 0;
+    NetSrvGetByIndex = 0;
+    NetSrvGetByURL = 0;
+    NetSrvSetCallbackAdded = 0;
+#ifdef LIBTIEPIE_LINUX
+    NetSrvSetEventAdded = 0;
+#endif
+#ifdef LIBTIEPIE_WINDOWS
+    NetSrvSetEventAdded = 0;
+    NetSrvSetMessageAdded = 0;
+#endif
     ObjClose = 0;
     ObjIsRemoved = 0;
     ObjGetInterfaces = 0;
@@ -1066,12 +1167,21 @@ LibTiePieStatus_t LibTiePieUnload()
     DevGetCalibrationDate = 0;
     DevGetCalibrationToken = 0;
     DevGetSerialNumber = 0;
+    DevGetIPv4Address = 0;
+    DevGetIPPort = 0;
     DevGetProductId = 0;
     DevGetVendorId = 0;
     DevGetType = 0;
     DevGetName = 0;
     DevGetNameShort = 0;
     DevGetNameShortest = 0;
+    DevHasBattery = 0;
+    DevGetBatteryCharge = 0;
+    DevGetBatteryTimeToEmpty = 0;
+    DevGetBatteryTimeToFull = 0;
+    DevIsBatteryChargerConnected = 0;
+    DevIsBatteryCharging = 0;
+    DevIsBatteryBroken = 0;
     DevSetCallbackRemoved = 0;
 #ifdef LIBTIEPIE_LINUX
     DevSetEventRemoved = 0;
@@ -1459,6 +1569,19 @@ LibTiePieStatus_t LibTiePieUnload()
     I2CGetSpeed = 0;
     I2CSetSpeed = 0;
     I2CVerifySpeed = 0;
+    SrvConnect = 0;
+    SrvDisconnect = 0;
+    SrvRemove = 0;
+    SrvGetStatus = 0;
+    SrvGetLastError = 0;
+    SrvGetURL = 0;
+    SrvGetID = 0;
+    SrvGetIPv4Address = 0;
+    SrvGetIPPort = 0;
+    SrvGetName = 0;
+    SrvGetDescription = 0;
+    SrvGetVersion = 0;
+    SrvGetVersionExtra = 0;
     HlpPointerArrayNew = 0;
     HlpPointerArraySet = 0;
     HlpPointerArrayDelete = 0;
