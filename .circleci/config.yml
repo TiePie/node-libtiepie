@@ -1,49 +1,49 @@
 version: 2.0
 
 jobs:
-  "nodejs-4":
-    docker:
-      - image: circleci/node:4-stretch
-    steps:
-      - checkout
-      - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
-      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian stretch non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
-      - run: sudo apt-get update
-      - run: sudo apt-get install -y libtiepie-dev
-      - run: npm install
-      - run: npm test
-
-  "nodejs-6":
-    docker:
-      - image: circleci/node:6-stretch
-    steps:
-      - checkout
-      - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
-      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian stretch non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
-      - run: sudo apt-get update
-      - run: sudo apt-get install -y libtiepie-dev
-      - run: npm install
-      - run: npm test
-
   "nodejs-8":
     docker:
-      - image: circleci/node:8-stretch
+      - image: circleci/node:8-buster
     steps:
       - checkout
       - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
-      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian stretch non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
+      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian buster non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
       - run: sudo apt-get update
       - run: sudo apt-get install -y libtiepie-dev
       - run: npm install
       - run: npm test
 
-  "nodejs-9":
+  "nodejs-10":
     docker:
-      - image: circleci/node:9-stretch
+      - image: circleci/node:10-buster
     steps:
       - checkout
       - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
-      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian stretch non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
+      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian buster non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y libtiepie-dev
+      - run: npm install
+      - run: npm test
+
+  "nodejs-12":
+    docker:
+      - image: circleci/node:12-buster
+    steps:
+      - checkout
+      - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
+      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian buster non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y libtiepie-dev
+      - run: npm install
+      - run: npm test
+
+  "nodejs-13":
+    docker:
+      - image: circleci/node:13-buster
+    steps:
+      - checkout
+      - run: wget -O - http://packages.tiepie.com/public.key | sudo apt-key add -
+      - run: sudo bash -c 'echo "deb http://packages.tiepie.com/debian buster non-free" > /etc/apt/sources.list.d/packages.tiepie.com.list'
       - run: sudo apt-get update
       - run: sudo apt-get install -y libtiepie-dev
       - run: npm install
@@ -53,7 +53,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - "nodejs-4"
-      - "nodejs-6"
       - "nodejs-8"
-      - "nodejs-9"
+      - "nodejs-10"
+      - "nodejs-12"
+      - "nodejs-13"
