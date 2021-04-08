@@ -58,10 +58,10 @@ extern "C"
 
 #define LIBTIEPIE_VERSION_MAJOR    0
 #define LIBTIEPIE_VERSION_MINOR    9
-#define LIBTIEPIE_VERSION_RELEASE  0
-#define LIBTIEPIE_VERSION_NUMBER   "0.9.0"
-#define LIBTIEPIE_VERSION          "0.9.0"
-#define LIBTIEPIE_REVISION         13850
+#define LIBTIEPIE_VERSION_RELEASE  14
+#define LIBTIEPIE_VERSION_NUMBER   "0.9.14"
+#define LIBTIEPIE_VERSION          "0.9.14"
+#define LIBTIEPIE_REVISION         14491
 
 /**
  * \mainpage
@@ -1358,18 +1358,24 @@ extern "C"
 #define PID_NONE        0 //!< Unknown/invalid ID
 #define PID_COMBI       2 //!< Combined instrument
 
-#define PID_HS3        13 //!< Handyscope HS3
-#define PID_HS4        15 //!< Handyscope HS4
-#define PID_HP3        18 //!< Handyprobe HP3
-#define PID_TP450      19 //!< TP450
-#define PID_HS4D       20 //!< Handyscope HS4-DIFF
-#define PID_HS5        22 //!< Handyscope HS5
-#define PID_HS6D       25 //!< Handyscope HS6 DIFF
-#define PID_ATS610004D 31 //!< ATS610004D
-#define PID_ATS605004D 32 //!< ATS605004D
-#define PID_125020VI   33 //!< Virtual instrument 1250-20
-#define PID_WS6        34 //!< WiFiScope WS6
-#define PID_WS5        35 //!< WiFiScope WS5
+#define PID_HS3            13 //!< Handyscope HS3
+#define PID_HS4            15 //!< Handyscope HS4
+#define PID_HP3            18 //!< Handyprobe HP3
+#define PID_TP450          19 //!< TP450
+#define PID_HS4D           20 //!< Handyscope HS4-DIFF
+#define PID_HS5            22 //!< Handyscope HS5
+#define PID_HS6            24 //!< Handyscope HS6
+#define PID_HS6D           25 //!< Handyscope HS6 DIFF
+#define PID_ATS610004D     31 //!< ATS610004D
+#define PID_ATS605004D     32 //!< ATS605004D
+#define PID_125020VI       33 //!< Virtual instrument 1250-20
+#define PID_WS6            34 //!< WiFiScope WS6
+#define PID_WS5            35 //!< WiFiScope WS5
+#define PID_WS6D           36 //!< WiFiScope WS6D
+#define PID_ATS610004DW    37 //!< ATS610004DW
+#define PID_ATS605004DW    38 //!< ATS605004DW
+#define PID_WS4D           39 //!< WiFiScope WS4D
+#define PID_ATS5004DW      40 //!< ATS5004DW
 
 /**
  * \}
@@ -2096,11 +2102,32 @@ LibTiePieHandle_t LstCreateAndOpenCombinedDevice( const LibTiePieHandle_t* pDevi
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
  *   </table>
  * \since 0.4.0
+ * \see LstRemoveDeviceForce
  */
 #ifdef LIBTIEPIE_DYNAMIC
 typedef void(*LibTiePieLstRemoveDevice_t)( uint32_t dwSerialNumber );
 #else
 void LstRemoveDevice( uint32_t dwSerialNumber );
+#endif
+
+/**
+ * \brief Remove an instrument from the device list even when it is in use so it can be used by other applications.
+ *
+ * \param[in] dwSerialNumber Serial number of the device to remove.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_NOT_SUPPORTED "NOT_SUPPORTED"</td>              <td>Device can't be removed from the list. To remove a combined Handyscope HS5, unplug the coupling cable and call LstUpdate().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_DEVICE_SERIALNUMBER "INVALID_DEVICE_SERIALNUMBER"</td><td>There is no device with the requested serial number.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td>    <td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                    <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \since 0.9.8
+ * \see LstRemoveDevice
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef void(*LibTiePieLstRemoveDeviceForce_t)(uint32_t dwSerialNumber);
+#else
+void LstRemoveDeviceForce(uint32_t dwSerialNumber);
 #endif
 
 /**
@@ -6955,6 +6982,10 @@ double ScpChTrVerifyTimeEx2( LibTiePieHandle_t hDevice , uint16_t wCh , uint32_t
  * - #ScpGetData2Ch
  * - #ScpGetData3Ch
  * - #ScpGetData4Ch
+ * - #ScpGetData5Ch
+ * - #ScpGetData6Ch
+ * - #ScpGetData7Ch
+ * - #ScpGetData8Ch
  *
  * The data is returned directly in Volt, Ampere or Ohm, depending on the \ref scp_ch_coupling "input coupling".
  *
@@ -7003,7 +7034,7 @@ double ScpChTrVerifyTimeEx2( LibTiePieHandle_t hDevice , uint16_t wCh , uint32_t
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
  *   </table>
  * \see hlp_ptrar for programming languages that don't support pointers to pointers, e.g. Matlab or Python.
- * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData7Ch, ScpGetData8Ch
  *
  * \par Example
  * \code{.c}
@@ -7096,7 +7127,7 @@ uint64_t ScpGetData1Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , uint64_t
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
  *   </table>
  * \see ScpGetData
- * \see ScpGetData1Ch, ScpGetData3Ch, ScpGetData4Ch
+ * \see ScpGetData1Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData7Ch, ScpGetData8Ch
  * \since 0.4.0
  */
 #ifdef LIBTIEPIE_DYNAMIC
@@ -7127,7 +7158,7 @@ uint64_t ScpGetData2Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* p
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
  *   </table>
  * \see ScpGetData
- * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData4Ch
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData7Ch, ScpGetData8Ch
  * \since 0.4.0
  */
 #ifdef LIBTIEPIE_DYNAMIC
@@ -7159,13 +7190,151 @@ uint64_t ScpGetData3Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* p
  *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
  *   </table>
  * \see ScpGetData
- * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData7Ch, ScpGetData8Ch
  * \since 0.4.0
  */
 #ifdef LIBTIEPIE_DYNAMIC
 typedef uint64_t(*LibTiePieScpGetData4Ch_t)( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , uint64_t qwStartIndex , uint64_t qwSampleCount );
 #else
 uint64_t ScpGetData4Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get the measurement data for the first five channels.
+ *
+ * The buffers contain data directly in Volt, Ampere or Ohm, depending on the \ref scp_ch_coupling "input coupling".
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the oscilloscope.
+ * \param[out] pBufferCh1 A pointer to the buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 A pointer to the buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 A pointer to the buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 A pointer to the buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 A pointer to the buffer for channel 5 data or \c NULL.
+ * \param[in] qwStartIndex The position in the record to start reading.
+ * \param[in] qwSampleCount The number of samples to read.
+ * \return The number of samples actually read.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>An error occurred during execution of the last called function.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_CLIPPED "VALUE_CLIPPED"</td>          <td>Retrieved less samples than indicated by qwSampleCount.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see ScpGetData
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData6Ch, ScpGetData7Ch, ScpGetData8Ch
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetData5Ch_t)( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetData5Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get the measurement data for the first six channels.
+ *
+ * The buffers contain data directly in Volt, Ampere or Ohm, depending on the \ref scp_ch_coupling "input coupling".
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the oscilloscope.
+ * \param[out] pBufferCh1 A pointer to the buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 A pointer to the buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 A pointer to the buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 A pointer to the buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 A pointer to the buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 A pointer to the buffer for channel 6 data or \c NULL.
+ * \param[in] qwStartIndex The position in the record to start reading.
+ * \param[in] qwSampleCount The number of samples to read.
+ * \return The number of samples actually read.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>An error occurred during execution of the last called function.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_CLIPPED "VALUE_CLIPPED"</td>          <td>Retrieved less samples than indicated by qwSampleCount.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see ScpGetData
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData7Ch, ScpGetData8Ch
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetData6Ch_t)( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetData6Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get the measurement data for the first seven channels.
+ *
+ * The buffers contain data directly in Volt, Ampere or Ohm, depending on the \ref scp_ch_coupling "input coupling".
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the oscilloscope.
+ * \param[out] pBufferCh1 A pointer to the buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 A pointer to the buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 A pointer to the buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 A pointer to the buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 A pointer to the buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 A pointer to the buffer for channel 6 data or \c NULL.
+ * \param[out] pBufferCh7 A pointer to the buffer for channel 7 data or \c NULL.
+ * \param[in] qwStartIndex The position in the record to start reading.
+ * \param[in] qwSampleCount The number of samples to read.
+ * \return The number of samples actually read.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>An error occurred during execution of the last called function.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_CLIPPED "VALUE_CLIPPED"</td>          <td>Retrieved less samples than indicated by qwSampleCount.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see ScpGetData
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData8Ch
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetData7Ch_t)( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , float* pBufferCh7 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetData7Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , float* pBufferCh7 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get the measurement data for the first eight channels.
+ *
+ * The buffers contain data directly in Volt, Ampere or Ohm, depending on the \ref scp_ch_coupling "input coupling".
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle" identifying the oscilloscope.
+ * \param[out] pBufferCh1 A pointer to the buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 A pointer to the buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 A pointer to the buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 A pointer to the buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 A pointer to the buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 A pointer to the buffer for channel 6 data or \c NULL.
+ * \param[out] pBufferCh7 A pointer to the buffer for channel 7 data or \c NULL.
+ * \param[out] pBufferCh8 A pointer to the buffer for channel 8 data or \c NULL.
+ * \param[in] qwStartIndex The position in the record to start reading.
+ * \param[in] qwSampleCount The number of samples to read.
+ * \return The number of samples actually read.
+ * \par Status values
+ *   <table class="params">
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>An error occurred during execution of the last called function.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_VALUE_CLIPPED "VALUE_CLIPPED"</td>          <td>Retrieved less samples than indicated by qwSampleCount.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_HANDLE "INVALID_HANDLE"</td>         <td>The handle is not a valid oscilloscope handle.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_OBJECT_GONE "OBJECT_GONE"</td>            <td>The object indicated by the handle is no longer available.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   </table>
+ * \see ScpGetData
+ * \see ScpGetData1Ch, ScpGetData2Ch, ScpGetData3Ch, ScpGetData4Ch, ScpGetData5Ch, ScpGetData6Ch, ScpGetData7Ch
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetData8Ch_t)( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , float* pBufferCh7 , float* pBufferCh8 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetData8Ch( LibTiePieHandle_t hDevice , float* pBufferCh1 , float* pBufferCh2 , float* pBufferCh3 , float* pBufferCh4 , float* pBufferCh5 , float* pBufferCh6 , float* pBufferCh7 , float* pBufferCh8 , uint64_t qwStartIndex , uint64_t qwSampleCount );
 #endif
 
 /**
@@ -7365,6 +7534,92 @@ uint64_t ScpGetDataRaw3Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* 
 typedef uint64_t(*LibTiePieScpGetDataRaw4Ch_t)( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , uint64_t qwStartIndex , uint64_t qwSampleCount );
 #else
 uint64_t ScpGetDataRaw4Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get raw measurement data.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle".
+ * \param[out] pBufferCh1 Pointer to buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 Pointer to buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 Pointer to buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 Pointer to buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 Pointer to buffer for channel 5 data or \c NULL.
+ * \param[in] qwStartIndex Position in record to start reading.
+ * \param[in] qwSampleCount Number of samples to read.
+ * \return Number of samples read.
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetDataRaw5Ch_t)( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetDataRaw5Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get raw measurement data.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle".
+ * \param[out] pBufferCh1 Pointer to buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 Pointer to buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 Pointer to buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 Pointer to buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 Pointer to buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 Pointer to buffer for channel 6 data or \c NULL.
+ * \param[in] qwStartIndex Position in record to start reading.
+ * \param[in] qwSampleCount Number of samples to read.
+ * \return Number of samples read.
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetDataRaw6Ch_t)( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetDataRaw6Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get raw measurement data.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle".
+ * \param[out] pBufferCh1 Pointer to buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 Pointer to buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 Pointer to buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 Pointer to buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 Pointer to buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 Pointer to buffer for channel 6 data or \c NULL.
+ * \param[out] pBufferCh7 Pointer to buffer for channel 7 data or \c NULL.
+ * \param[in] qwStartIndex Position in record to start reading.
+ * \param[in] qwSampleCount Number of samples to read.
+ * \return Number of samples read.
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetDataRaw7Ch_t)( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , void* pBufferCh7 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetDataRaw7Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , void* pBufferCh7 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#endif
+
+/**
+ * \brief Get raw measurement data.
+ *
+ * \param[in] hDevice A \ref OpenDev "device handle".
+ * \param[out] pBufferCh1 Pointer to buffer for channel 1 data or \c NULL.
+ * \param[out] pBufferCh2 Pointer to buffer for channel 2 data or \c NULL.
+ * \param[out] pBufferCh3 Pointer to buffer for channel 3 data or \c NULL.
+ * \param[out] pBufferCh4 Pointer to buffer for channel 4 data or \c NULL.
+ * \param[out] pBufferCh5 Pointer to buffer for channel 5 data or \c NULL.
+ * \param[out] pBufferCh6 Pointer to buffer for channel 6 data or \c NULL.
+ * \param[out] pBufferCh7 Pointer to buffer for channel 7 data or \c NULL.
+ * \param[out] pBufferCh8 Pointer to buffer for channel 8 data or \c NULL.
+ * \param[in] qwStartIndex Position in record to start reading.
+ * \param[in] qwSampleCount Number of samples to read.
+ * \return Number of samples read.
+ * \since 0.9.11
+ */
+#ifdef LIBTIEPIE_DYNAMIC
+typedef uint64_t(*LibTiePieScpGetDataRaw8Ch_t)( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , void* pBufferCh7 , void* pBufferCh8 , uint64_t qwStartIndex , uint64_t qwSampleCount );
+#else
+uint64_t ScpGetDataRaw8Ch( LibTiePieHandle_t hDevice , void* pBufferCh1 , void* pBufferCh2 , void* pBufferCh3 , void* pBufferCh4 , void* pBufferCh5 , void* pBufferCh6 , void* pBufferCh7 , void* pBufferCh8 , uint64_t qwStartIndex , uint64_t qwSampleCount );
 #endif
 
 /**
@@ -15671,10 +15926,9 @@ uint32_t SrvGetVersionExtra( LibTiePieHandle_t hServer , char* pBuffer , uint32_
  * \return A pointer to the pointer array.
  * \par Status values
  *   <table class="params">
- *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td>          <td>The requested length is invalid.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>An error occurred during execution of the last called function.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_VALUE "INVALID_VALUE"</td><td>The requested length is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td> <td>An error occurred during execution of the last called function.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>      <td>The function executed successfully.</td></tr>
  *   </table>
  * \since 0.4.1
  */
@@ -15692,10 +15946,8 @@ LibTiePiePointerArray_t HlpPointerArrayNew( uint32_t dwLength );
  * \param[in] pPointer The pointer value to set.
  * \par Status values
  *   <table class="params">
- *   <tr><td>\ref LIBTIEPIESTATUS_INVALID_INDEX "INVALID_INDEX"</td>          <td>The array index is invalid.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>The pointer to the array is invalid.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td><td>The pointer to the array is invalid.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>     <td>The function executed successfully.</td></tr>
  *   </table>
  * \since 0.4.1
  */
@@ -15711,9 +15963,7 @@ void HlpPointerArraySet( LibTiePiePointerArray_t pArray , uint32_t dwIndex , voi
  * \param[in] pArray A pointer identifying the pointer array.
  * \par Status values
  *   <table class="params">
- *   <tr><td>\ref LIBTIEPIESTATUS_UNSUCCESSFUL "UNSUCCESSFUL"</td>           <td>The pointer to the array is invalid.</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_LIBRARY_NOT_INITIALIZED "LIBRARY_NOT_INITIALIZED"</td><td>The library is not initialized, see LibInit().</td></tr>
- *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td>                <td>The function executed successfully.</td></tr>
+ *   <tr><td>\ref LIBTIEPIESTATUS_SUCCESS "SUCCESS"</td><td>The function executed successfully.</td></tr>
  *   </table>
  * \since 0.4.1
  */
